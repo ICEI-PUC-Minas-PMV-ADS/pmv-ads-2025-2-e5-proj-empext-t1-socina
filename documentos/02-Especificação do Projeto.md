@@ -1,102 +1,122 @@
 # Especificações do Projeto
 
-<span style="color:red">Pré-requisitos: <a href="01-Documentação de Contexto.md"> Documentação de Contexto</a></span>
+<span style="color:red">Pré-requisitos: <a href="../Documentação de contexto/introducao.md"> Documentação de Contexto</a></span>
 
 Definição do problema e ideia de solução a partir da perspectiva do usuário. 
 
 ## Usuários
-| Tipo de Usuário   | Descrição | Responsabilidades |
-|------------------|-----------|------------------|
-| **xxx** | xxxxx | xxxxx |
-
-### Exemplo
 
 | Tipo de Usuário   | Descrição | Responsabilidades |
 |------------------|-----------|------------------|
-| **Administrador** | Gerencia a aplicação e os usuários. | Gerenciar usuários, configurar o sistema, acessar todos os relatórios. |
-| **Funcionário** | Usa a aplicação para suas tarefas principais. | Criar e editar registros, visualizar relatórios. |
+| **Administrador** | Dono(a) da loja de roupas que gerencia todo o sistema. | Cadastrar, editar e excluir produtos; gerenciar estoque; acompanhar pedidos; cadastrar clientes; gerar relatórios de vendas. |
+| **Cliente** | Usuário que acessa o catálogo online de produtos. | Cadastrar-se, visualizar produtos em estoque, realizar pedidos e acompanhar status. |
 
+---
 
 ## Arquitetura e Tecnologias
 
-Descreva brevemente a arquitetura definida para o projeto e as tecnologias a serem utilizadas. Sugere-se a criação de um diagrama de componentes da solução.
+O sistema será baseado em uma arquitetura **Web MVC (Model-View-Controller)** utilizando **Django (Python)** no backend, banco de dados **SQLite** (ou PostgreSQL em produção) e **HTML/CSS/Tailwind/JavaScript** no frontend.  
+
+A comunicação entre as camadas será feita através de views do Django, que retornarão templates renderizados dinamicamente com os dados da base de dados.  
+ ''Para pagamento, será integrado o **Stripe** (cartão, Pix e boleto via API).  
+Para cálculo de frete, será utilizada a **API dos Correios**. ''
+
+**Resumo das Tecnologias:**
+- **Backend:** Python 3.13, Django 5. 
+- **Frontend:** HTML5, CSS3 (Tailwind), JavaScript  
+- **Banco de Dados:** SQLite (desenvolvimento) / PostgreSQL (produção)  
+- **Pagamentos:** Stripe API  
+- **Frete:** API Correios  
+- **Hospedagem:** GitHub + servidor  
+
+---
 
 ## Project Model Canvas
 
-Deve ser desenvolvido a partir do microfundamento: Empreendedorismo e inovação.
-Colocar a imagem do modelo construído apresentando a proposta de solução.
-
-> **Links Úteis**:
-> Disponíveis em material de apoio do projeto
 
 ## Requisitos
 
-As tabelas que se seguem apresentam os requisitos funcionais e não funcionais que detalham o escopo do projeto. Para determinar a prioridade de requisitos, aplicar uma técnica de priorização de requisitos e detalhar como a técnica foi aplicada.
-
-Para mais informações, consulte os microfundamentos Fundamentos de Engenharia de Software e Engenharia de Requisitos de Software. 
-
 ### Requisitos Funcionais
 
-|ID    | Descrição do Requisito  | Prioridade |
-|------|-----------------------------------------|----|
-|RF-001| Permitir que o usuário cadastre tarefas | ALTA | 
-|RF-002| Emitir um relatório de tarefas no mês   | MÉDIA |
+| ID     | Descrição do Requisito | Prioridade |
+|--------|------------------------|------------|
+| RF-001 | Permitir que o administrador cadastre, edite e exclua produtos. | ALTA |
+| RF-002 | Permitir que o administrador controle o estoque (entrada e saída de itens). | ALTA |
+| RF-003 | Disponibilizar um catálogo online de produtos para clientes. | ALTA |
+| RF-004 | Permitir que clientes realizem pedidos online. | ALTA |
+| RF-005 | Exibir apenas produtos disponíveis em estoque no catálogo. | ALTA |
+| RF-006 | Permitir cadastro de clientes. | MÉDIA |
+| RF-007 | Permitir que clientes acompanhem seus pedidos. | MÉDIA |
+| RF-008 | Gerar relatórios de vendas para o administrador. | MÉDIA |
 
-### Requisitos não Funcionais
+### Requisitos Não Funcionais
 
-|ID     | Descrição do Requisito  |Prioridade |
-|-------|-------------------------|----|
-|RNF-001| O sistema deve ser responsivo para rodar em um dispositivos móvel | MÉDIA | 
-|RNF-002| Deve processar requisições do usuário em no máximo 3s |  BAIXA | 
+| ID      | Descrição do Requisito | Prioridade |
+|---------|------------------------|------------|
+| RNF-001 | O sistema deve ser responsivo, acessível em computadores e dispositivos móveis. | ALTA |
+| RNF-002 | O sistema deve processar requisições do usuário em no máximo 3 segundos. | MÉDIA |
+| RNF-003 | O sistema deve garantir segurança no armazenamento de senhas (hash + salt). | ALTA |
+| RNF-004 | O sistema deve garantir que o catálogo só exiba produtos disponíveis. | ALTA |
+| RNF-005 | O sistema deve utilizar autenticação para separar acessos de administrador e cliente. | ALTA |
 
-Com base nas Histórias de Usuário, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
-
-- [Requisitos Funcionais
- (RF)](https://pt.wikipedia.org/wiki/Requisito_funcional):
- correspondem a uma funcionalidade que deve estar presente na
-  plataforma (ex: cadastro de usuário).
-- [Requisitos Não Funcionais
-  (RNF)](https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional):
-  correspondem a uma característica técnica, seja de usabilidade,
-  desempenho, confiabilidade, segurança ou outro (ex: suporte a
-  dispositivos iOS e Android).
-Lembre-se que cada requisito deve corresponder à uma e somente uma
-característica alvo da sua solução. Além disso, certifique-se de que
-todos os aspectos capturados nas Histórias de Usuário foram cobertos.
+---
 
 ## Restrições
 
-O projeto está restrito pelos itens apresentados na tabela a seguir.
+| ID | Restrição |
+|----|-----------|
+| 01 | O projeto deverá ser entregue até o final do semestre. |
+| 02 | A primeira versão deverá utilizar SQLite, podendo migrar para PostgreSQL em produção. |
 
-|ID| Restrição                                             |
-|--|-------------------------------------------------------|
-|01| O projeto deverá ser entregue até o final do semestre |
-|02| Não pode ser desenvolvido um módulo de backend        |
-
-Enumere as restrições à sua solução. Lembre-se de que as restrições geralmente limitam a solução candidata.
-
-> **Links Úteis**:
-> - [O que são Requisitos Funcionais e Requisitos Não Funcionais?](https://codificar.com.br/requisitos-funcionais-nao-funcionais/)
-> - [O que são requisitos funcionais e requisitos não funcionais?](https://analisederequisitos.com.br/requisitos-funcionais-e-requisitos-nao-funcionais-o-que-sao/)
+---
 
 ## Diagrama de Caso de Uso
 
-O diagrama de casos de uso é o próximo passo após a elicitação de requisitos, que utiliza um modelo gráfico e uma tabela com as descrições sucintas dos casos de uso e dos atores. Ele contempla a fronteira do sistema e o detalhamento dos requisitos funcionais com a indicação dos atores, casos de uso e seus relacionamentos. 
+O diagrama abaixo representa as interações dos atores com o sistema:
 
-Para mais informações, consulte o microfundamento Engenharia de Requisitos de Software 
+![Diagrama de Caso de Uso](/documentos/img/Caso_de_uso_Socina.drawio.png)
 
-As referências abaixo irão auxiliá-lo na geração do artefato “Diagrama de Casos de Uso”.
-
-> **Links Úteis**:
-> - [Criando Casos de Uso](https://www.ibm.com/docs/pt-br/elm/6.0?topic=requirements-creating-use-cases)
-> - [Como Criar Diagrama de Caso de Uso: Tutorial Passo a Passo](https://gitmind.com/pt/fazer-diagrama-de-caso-uso.html/)
-> - [Lucidchart](https://www.lucidchart.com/)
-> - [Astah](https://astah.net/)
-> - [Diagrams](https://app.diagrams.net/)
+---
 
 ## Projeto da Base de Dados
 
-O projeto da base de dados corresponde à representação das entidades e relacionamentos identificadas no Modelo ER, no formato de tabelas, com colunas e chaves primárias/estrangeiras necessárias para representar corretamente as restrições de integridade.
- 
-Para mais informações, consulte o microfundamento "Modelagem de Dados".
+O modelo de banco de dados segue o padrão relacional, estruturado para dar suporte ao controle de estoque, catálogo de produtos e pedidos.
 
+### Modelo Entidade-Relacionamento (MER)
+
+Entidades principais:
+- **Cliente** (id, nome, email, senha, endereço)  
+- **Produto** (id, nome, descrição, preço, quantidade_estoque, categoria)  
+- **Pedido** (id, cliente_id, data, status, total)  
+- **ItemPedido** (id, pedido_id, produto_id, quantidade, subtotal)  
+
+### Projeto Físico da Base de Dados
+
+**Tabela Cliente**  
+- id (PK, inteiro, autoincremento)  
+- nome (varchar)  
+- email (varchar, único)  
+- senha (varchar, hash)  
+- endereço (varchar)  
+
+**Tabela Produto**  
+- id (PK, inteiro, autoincremento)  
+- nome (varchar)  
+- descrição (text)  
+- preço (decimal)  
+- quantidade_estoque (inteiro)  
+- categoria (varchar)  
+
+**Tabela Pedido**  
+- id (PK, inteiro, autoincremento)  
+- cliente_id (FK -> Cliente.id)  
+- data (datetime)  
+- status (varchar: "em andamento", "concluído", "cancelado")  
+- total (decimal)  
+
+**Tabela ItemPedido**  
+- id (PK, inteiro, autoincremento)  
+- pedido_id (FK -> Pedido.id)  
+- produto_id (FK -> Produto.id)  
+- quantidade (inteiro)  
+- subtotal (decimal)  
