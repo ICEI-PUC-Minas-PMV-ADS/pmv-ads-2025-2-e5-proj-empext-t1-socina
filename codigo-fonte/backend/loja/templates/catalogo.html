@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catálogo de Produtos</title>
+</head>
+<body>
+    <h1>Catálogo</h1>
+    <ul>
+        {% for produto in produtos %}
+            <li>{{ produto.nome }} - R$ {{ produto.preco }}</li>
+        {% empty %}
+            <li>Nenhum produto disponível</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'home' %}">Voltar</a>
+</body>
+</html>

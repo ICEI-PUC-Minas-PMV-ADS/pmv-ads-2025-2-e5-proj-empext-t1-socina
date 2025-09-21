@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Produto Form</title>
+<link href="assets/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4">
+<h1 class="text-2xl font-bold mb-4">Cadastro/Edição Produto</h1>
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="bg-blue-500 text-white px-4 py-2 rounded">Salvar</button>
+</form>
+</body>
+</html>

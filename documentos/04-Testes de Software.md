@@ -1,184 +1,126 @@
-# Planos de Testes de Software
+# Plano de Testes de Software 
 
-Apresente os casos de testes utilizados na realização da verificação e validação da aplicação. Escolha cenários de testes que demonstrem os requisitos sendo satisfeitos bem como o tratamento de erros (robustez da aplicação).
+> Documento no padrão PUC: associação de requisitos aos casos de teste e evidências para anexar na entrega da Sprint.
 
-### Tipo de Teste
-- **Sucesso**: Tem o objetivo de verificar se as funcionalidades funcionam corretamente.
-- **Insucesso**: Tem o objetivo de verificar se o sistema trata erros de maneira correta.
+**Pré-requisito:** este plano refere-se **apenas** às funcionalidades desenvolvidas na Etapa 2 (login e cadastro/exibição de produtos).
 
-#### Exemplo de Caso de Teste de Sucesso
-O caso de teste de sucesso deve ser identificado por CT - xxx - S
+---
 
-<table>
-  <tr>
-    <th colspan="2" width="1000">CT-001 - S<br>Login com credenciais válidas</th>
-  </tr>
-  <tr>
-    <td width="150"><strong>Descrição</strong></td>
-    <td>Este caso de teste verifica se um usuário pode fazer login com sucesso utilizando credenciais válidas.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável Caso de Teste </strong></td>
-    <td width="430">José da Silva</td>
-  </tr>
- <tr>
-    <td><strong>Tipo do Teste</strong></td>
-    <td width="430">Sucesso</td>
-  </tr> 
-  <tr>
-    <td><strong>Requisitos associados</strong></td>
-    <td>RF-001: O funcionário deve conseguir logar no aplicativo</td>
-  </tr>
-  <tr>
-    <td><strong>Passos</strong></td>
-    <td>
-      1. Abrir o aplicativo.<br>
-      2. Inserir o CPF válido.<br>
-      3. Inserir a senha válida.<br>
-      4. Clicar no botão "Entrar".
-      </td>
-  </tr>
-    <tr>
-    <td><strong>Dados de teste</strong></td>
-    <td>
-      - <strong>CPF:</strong> Colocar CPF cadastrado na base<br>
-      - <strong>Senha:</strong> Colocar valor de senha válida
-  </tr>
-    <tr>
-    <td><strong>Critérios de êxito</strong></td>
-    <td>O sistema deve redirecionar o usuário para a página inicial do aplicativo após o login bem-sucedido.</td>
-  </tr>
-</table>
+# 1. Resumo — Associação Requisitos × Casos de Teste
 
-#### Exemplo de Caso de Teste de Insucesso
-Os casos de testes de insucesso devem ser identificados por CT - xxx - I + sequencial de insucesso.
-Para cada etapa do projeto, criar uma seção com o nome da Etapa do projeto: Etapa 2, Etapa 3 e Etapa 4
-### ETAPA 2  
-<table>
-  <tr>
-    <th colspan="2" width="1000">CT-001 - I01<br>Login com credenciais inválidas</th>
-  </tr>
-  <tr>
-    <td width="150"><strong>Descrição</strong></td>
-    <td>Este caso de teste verifica o tratamento de credenciais inválidas no login.</td>
-  </tr>
-  <tr>
-    <td><strong>Responsável Caso de Teste </strong></td>
-    <td width="430">José da Silva</td>
-  </tr>
- <tr>
-    <td><strong>Tipo do Teste</strong></td>
-    <td width="430">Insucesso</td>
-  </tr> 
-  <tr>
-    <td><strong>Requisitos associados</strong></td>
-    <td>RF-001: O funcionário não conseguirá logar no aplicativo</td>
-  </tr>
-  <tr>
-    <td><strong>Passos</strong></td>
-    <td>
-      1. Abrir o aplicativo.<br>
-      2. Inserir o CPF válido.<br>
-      3. Inserir a senha inválida.<br>
-      4. Clicar no botão "Entrar".
-      </td>
-  </tr>
-    <tr>
-    <td><strong>Dados de teste</strong></td>
-    <td>
-      - <strong>CPF:</strong> Colocar CPF cadastrado na base<br>
-      - <strong>Senha:</strong> Colocar senha inválida
-  </tr>
-    <tr>
-    <td><strong>Critérios de êxito</strong></td>
-    <td>O sistema deve apresentar a mensagem de login inválido.</td>
-  </tr>
-</table>
+| Caso de Teste                           | Código       | Tipo      | Requisitos verificados                                                 | Objetivo                                                                          |
+| --------------------------------------- | ------------ | --------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Login com credenciais válidas           | CT-001 - S   | Sucesso   | RNF-005 (Autenticação); RF-001 (Acesso às funções de administrador)    | Verificar que usuários autorizados conseguem acessar o sistema (admin).           |
+| Login com credenciais inválidas         | CT-001 - I01 | Insucesso | RNF-005 (Autenticação); RNF-003 (Segurança de senhas)                  | Verificar tratamento de erro e bloqueio de acesso com credenciais inválidas.      |
+| Cadastro de produto (Admin)             | CT-002 - S   | Sucesso   | RF-001 (CRUD de produtos); RF-002 (Campo quantidade\_estoque presente) | Verificar criação de produto pelo Admin e persistência dos dados.                 |
+| Exibição do produto no catálogo público | CT-003 - S   | Sucesso   | RF-003 (Catálogo); RF-005 (Mostrar apenas produtos com estoque > 0)    | Verificar que o produto cadastrado aparece no catálogo público quando em estoque. |
 
-### ETAPA 3
-Criar casos de teste da etapa 3
+---
 
-### ETAPA 4
-Criar casos de teste da etapa 4
- 
-# Evidências de Testes de Software
+# 2. Casos de Teste (detalhados)
 
-Apresente imagens e/ou vídeos que comprovam que um determinado teste foi executado, e o resultado esperado foi obtido. Normalmente são screenshots de telas, ou vídeos do software em funcionamento.
+## CT-001 - S — Login com credenciais válidas
 
-## Parte 1 - Testes de desenvolvimento
-Cada funcionalidade desenvolvida deve ser testada pelo próprio desenvolvedor, utilizando casos de teste, tanto de sucesso quanto de insucesso, elaborados por ele. Todos os testes devem ser evidenciados.
+* **Descrição:** Verificar autenticação de usuário administrador.
+* **Responsável:** Victor Araújo
+* **Tipo:** Sucesso
+* **Requisitos associados:** RNF-005, RF-001
+* **Passos:**
 
-### Exemplo
-### ETAPA 2
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-001<br>Login com credenciais válidas</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O sistema deve redirecionar o usuário para a página inicial do aplicativo após o login bem-sucedido.</td>
-  </tr>
-    <tr>
-    <td><strong>Responsável pela funcionalidade (desenvolvimento e teste)</strong></td>
-    <td width="430">José da Silva </td>
-     <td width="100"><strong>Data do Teste</strong></td>
-    <td width="150">08/05/2024</td>
-  </tr>
-    <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O sistema está permitindo o login corretamente.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><video src="https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e5-proj-time-sheet/assets/82043220/2e3c1722-7adc-4bd4-8b4c-3abe9ddc1b48"/></td>
-  </tr>
-</table>
+  1. Abrir a página de login (127.0.0.1:8000/admin/).
+  2. Inserir usuário: `admin`.
+  3. Inserir senha: senha válida.
+  4. Clicar em "Acessar".
+* **Dados de teste:** usuário `admin` (existente no banco).
+* **Critério de êxito:** Redirecionamento para o painel do Django Admin.
+* **Evidência:** ![alt text](<img/tela login sucesso.png>) (screenshot do admin após login).
 
-### ETAPA 3
-Colocar evidências de teste da etapa 3
+---
 
-### ETAPA 4
-Colocar evidências de teste da etapa 4
+## CT-001 - I01 — Login com credenciais inválidas
 
-## Parte 2 - Testes por pares
-A fim de aumentar a qualidade da aplicação desenvolvida, cada funcionalidade deve ser testada por um colega e os testes devem ser evidenciados. O colega "Tester" deve utilizar o caso de teste criado pelo desenvolvedor responsável pela funcionalidade (desenvolveu a funcionalidade e criou o caso de testes descrito no plano de testes) e caso perceba a necessidade de outros casos de teste, deve acrescentá-los na sessão "Plano de Testes".
+* **Descrição:** Verificar tratamento quando são fornecidas credenciais inválidas.
+* **Responsável:** Victor Araújo
+* **Tipo:** Insucesso
+* **Requisitos associados:** RNF-005, RNF-003
+* **Passos:**
 
-### ETAPA 2
+  1. Abrir a página de login.
+  2. Inserir usuário: `admin`.
+  3. Inserir senha: `senha_invalida`.
+  4. Clicar em "Acessar".
+* **Dados de teste:** usuário/senha inexistentes.
+* **Critério de êxito:** Sistema apresenta mensagem de erro e não permite o acesso.
+* **Evidência:** ![alt text](<img/tela login sem sucesso.png>) (screenshot da tentativa de login com erro).
 
-### Exemplo
-<table>
-  <tr>
-    <th colspan="6" width="1000">CT-001<br>Login com credenciais válidas</th>
-  </tr>
-  <tr>
-    <td width="170"><strong>Critérios de êxito</strong></td>
-    <td colspan="5">O sistema deve redirecionar o usuário para a página inicial do aplicativo após o login bem-sucedido.</td>
-  </tr>
-    <tr>
-      <td><strong>Responsável pela funcionalidade</strong></td>
-    <td width="430">José da Silva </td>
-      <td><strong>Responsável pelo teste</strong></td>
-    <td width="430">Maria Oliveira </td>
-     <td width="100"><strong>Data do teste</strong></td>
-    <td width="150">08/05/2024</td>
-  </tr>
-    <tr>
-    <td width="170"><strong>Comentário</strong></td>
-    <td colspan="5">O sistema está permitindo o login corretamente.</td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><strong>Evidência</strong></td>
-  </tr>
-  <tr>
-    <td colspan="6" align="center"><video src="https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e5-proj-time-sheet/assets/82043220/2e3c1722-7adc-4bd4-8b4c-3abe9ddc1b48"/></td>
-  </tr>
-</table>
+---
 
-### ETAPA 3
-Colocar evidências de teste da etapa 3
+## CT-002 - S — Cadastro de Produto (Admin)
 
-### ETAPA 4
-Colocar evidências de teste da etapa 4
+* **Descrição:** Validar cadastro de produto via Django Admin.
+* **Responsável:** Victor Araújo
+* **Tipo:** Sucesso
+* **Requisitos associados:** RF-001, RF-002
+* **Passos:**
+
+  1. Logar como admin no Django Admin.
+  2. Acessar *Loja → Produtos → Adicionar Produto*.
+  3. Preencher: Nome, Descrição, Preço, Quantidade estoque, Categoria.
+  4. Salvar.
+* **Dados de teste:** Nome: `Camisa teste`; Preço: `15.00`; Quantidade: `13`; Categoria: `camisa`.
+* **Critério de êxito:** Produto salvo com sucesso e aparece na lista de produtos no Admin.
+* **Evidências:**
+
+  * ![alt text](<img/adição de produto.png>) (formulário de adicionar produto com campos preenchidos).
+  * ![alt text](<img/adição de produto adição.png>)(mensagem de sucesso: produto adicionado).
+
+---
+
+## CT-003 - S — Exibição do produto no catálogo público
+
+* **Descrição:** Verificar que o produto cadastrado aparece no catálogo público.
+* **Responsável:** Victor Araújo
+* **Tipo:** Sucesso
+* **Requisitos associados:** RF-003, RF-005
+* **Passos:**
+
+  1. Abrir a página do catálogo público (ex.: `/catalogo/`).
+  2. Confirmar presença do produto `Camisa teste` e do produto `calça cargo` com preço exibido.
+* **Dados de teste:** catálogo da aplicação com produtos cadastrados.
+* **Critério de êxito:** Produtos com estoque > 0 são exibidos com nome e preço formatado.
+* **Evidência:** ![alt text](<img/catalogo após atualização de adição do produto dinamico.png>) (catálogo com os produtos listados).
+
+---
+
+# 3. Testes por Pares (Peer Testing)
+
+* **Objetivo:** outro membro da equipe reexecuta os mesmos CT criados pelo desenvolvedor e registra suas observações.
+
+### Exemplo de preenchimento (peer test)
+
+* **Caso testado:** CT-002 — Cadastro de Produto
+* **Responsável (desenvolvedor):** \[Seu Nome]
+* **Tester (par):** \[Nome do colega]
+* **Data:** 21/09/2025
+* **Resultado:** Produto cadastrado com sucesso; observação: validar obrigatoriedade do campo `categoria`.
+* **Evidência Peer:** `14362085-3600-441a-a3d3-30b3833d03de.png` (lista de produtos) e `1872cedc-4f60-455d-a924-15f3dfd5b21c.png` (formulário).
+
+---
+
+# 4. Instruções para anexar ao repositório e gerar o documento final
+
+1. Copie este arquivo para `documentacao/plano_de_testes_etapa2.md`.
+2. Crie a pasta `documentacao/evidencias/` e coloque aqui todos os PNGs enviados (renomeie se desejar).
+3. Atualize os nomes dos arquivos nas seções de Evidências, se renomear.
+4. Gere PDF / .docx (VS Code: usar extensão Markdown PDF ou exportar pelo editor).
+
+---
+
+# 5. Controle de Versões
+
+* **Versão:** 1.0
+* **Autor:** Victor Araújo
+* **Data:** 21/09/2025
+
+---
 

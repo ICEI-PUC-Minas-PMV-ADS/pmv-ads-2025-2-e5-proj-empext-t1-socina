@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Admin Produtos</title>
+<link href="assets/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4">
+<h1 class="text-2xl font-bold mb-4">CRUD Produtos</h1>
+<a href="{% url 'cadastra_produto' %}" class="bg-green-500 text-white px-4 py-2 rounded mb-4 inline-block">Novo Produto</a>
+<table class="table-auto w-full bg-white">
+<tr class="bg-gray-300">
+  <th>Nome</th>
+  <th>Preço</th>
+  <th>Estoque</th>
+  <th>Ações</th>
+</tr>
+{% for produto in produtos %}
+<tr>
+  <td>{{ produto.nome }}</td>
+  <td>{{ produto.preco }}</td>
+  <td>{{ produto.quantidade_estoque }}</td>
+  <td>
+    <a href="{% url 'edita_produto' produto.id %}" class="bg-yellow-500 text-white px-2 py-1 rounded">Editar</a>
+    <a href="{% url 'deleta_produto' produto.id %}" class="bg-red-500 text-white px-2 py-1 rounded">Deletar</a>
+  </td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
