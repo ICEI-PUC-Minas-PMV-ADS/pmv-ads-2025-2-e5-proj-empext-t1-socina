@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Pedido Confirmado - SOCINA{% endblock %}
+{% block content %}
+<section class="color-bg section">
+    <div class="main-content" style="text-align: center;">
+        <div class="spacing"></div>
+        <h2 style="color: var(--pink-color);">Pedido Realizado com Sucesso!</h2>
+        <div style="background: white; color: black; padding: 2rem; border-radius: 8px; display: inline-block;">
+            <p>Obrigado pela sua compra!</p>
+            <p><strong>Número do Pedido:</strong> #{{ pedido.id }}</p>
+            <p><strong>Total:</strong> R$ {{ pedido.total }}</p>
+        </div>
+        <br><br>
+        <a href="{% url 'catalogo' %}" style="color: var(--pink-color);">Continuar Comprando</a>
+    </div>
+</section>
+{% endblock %}

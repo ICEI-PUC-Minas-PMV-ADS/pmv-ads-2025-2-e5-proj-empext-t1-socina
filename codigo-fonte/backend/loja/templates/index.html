@@ -1,17 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<title>Loja de Roupas</title>
-<link href="assets/css/tailwind.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100">
-<header class="p-4 bg-blue-500 text-white text-center font-bold text-xl">
-  Bem-vindo à Loja de Roupas
-</header>
-<main class="p-4">
-  <a href="catalogo.html" class="bg-green-500 text-white px-4 py-2 rounded">Ver Catálogo</a>
-  <a href="produtos.html" class="bg-yellow-500 text-white px-4 py-2 rounded">Admin Produtos</a>
-</main>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+   <section class="hero-bg bg-cover bg-center">
+    <div class="container mx-auto flex items-center justify-center min-h-screen">
+        <div class="text-center text-white bg-black bg-opacity-30 p-8 rounded-lg">
+            <h2 class="text-5xl font-bold mb-4">Sejam bem-vindos à SOCINA!</h2>
+            <p class="text-xl mb-8">Venham desfrutar da arte que é se vestir.</p>
+            <a href="{% url 'catalogo' %}" class="bg-socina-pink-light text-white font-bold py-3 px-6 rounded-lg hover:bg-socina-pink-dark transition-colors">
+                Ver Produtos
+            </a>
+        </div>
+    </div>
+   </section>
+
+   <section class="bg-gray-50 py-16">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold text-socina-pink-dark mb-12">Comprando com a gente você tem:</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+                <div class="flex flex-col items-center">
+                    <img src="{% static 'assets/images/cupom-de-desconto.png' %}" class="benefit-icon">
+                    <p class="font-semibold">10% off na 1ª compra</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="{% static 'assets/images/delivery.png' %}" class="benefit-icon">
+                    <p class="font-semibold">Frete fixo para BH</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="{% static 'assets/images/credit-card.png' %}" class="benefit-icon">
+                    <p class="font-semibold">Parcelamento facilitado</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="{% static 'assets/images/delivery-man.png' %}" class="benefit-icon">
+                    <p class="font-semibold">Opção de Retirada</p>
+                </div>
+                 <div class="flex flex-col items-center col-span-2 md:col-span-1">
+                    <img src="{% static 'assets/images/checklist.png' %}" class="benefit-icon">
+                    <p class="font-semibold">Frete grátis (+ R$600)</p>
+                </div>
+            </div>
+        </div>
+   </section>
+{% endblock %}

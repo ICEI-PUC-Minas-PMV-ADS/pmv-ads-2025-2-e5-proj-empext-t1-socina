@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Cadastro - SOCINA{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center py-12">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-3xl font-bold text-center text-socina-pink-dark mb-6">Crie sua Conta</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="mt-6">
+                <button type="submit" class="w-full bg-socina-pink-dark text-white font-bold py-2 px-4 rounded hover:opacity-90 focus:outline-none focus:shadow-outline">
+                    Cadastrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
