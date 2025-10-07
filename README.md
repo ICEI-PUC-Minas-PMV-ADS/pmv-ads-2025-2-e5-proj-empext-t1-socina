@@ -1,12 +1,12 @@
-# TÍTULO DO PROJETO
+# Socina
 
-`CURSO`
+`Análise e desenvolvimento de sistemas`
 
-`DISCIPLINA`
+`Projeto: Desenvolvimento de um Sistema Sociotécnico Inovador`
 
-`SEMESTRE`
+`2° Semestre`
 
-Descrever resumidamente, em um ou dois parágrafos, o projeto que está sendo desenvolvido.
+O projeto visa desenvolver um sistema sociotécnico para uma pequena loja de roupas, aplicando os conceitos de extensão universitária. A loja parceira enfrenta dificuldades por não possuir um controle de estoque informatizado e por não realizar vendas online. Para solucionar esses problemas, o projeto propõe a criação de um sistema web com duas interfaces: uma área administrativa para o lojista gerenciar produtos (cadastrar, atualizar, remover) e controlar o estoque de forma dinâmica, e uma área para o cliente, que funcionará como um catálogo online, exibindo apenas os produtos disponíveis. O sistema também permitirá o acompanhamento de pedidos e a geração de relatórios de vendas, fornecendo ferramentas essenciais para a tomada de decisão. A iniciativa busca modernizar a gestão da loja, ampliar seu alcance de clientes e, ao mesmo tempo, proporcionar aos estudantes uma experiência prática no desenvolvimento de uma solução tecnológica com impacto social direto.
 
 ## Integrantes
 
