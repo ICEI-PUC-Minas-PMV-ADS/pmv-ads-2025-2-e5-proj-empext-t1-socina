@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # CHAVE SECRETA (ALTERADO)
 # Vamos ler a chave do ambiente do Render. É mais seguro.
-SECRET_KEY = os.environ.get('SECRET_KEY', '5(hqx61d6jhzy2jo@wrejr9_az@y3l)*374q&d5zge7!a1)5gn')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'sua_chave_secreta_padrao_insegura_para_testes_locais')
 
 # MODO DEBUG (ALTERADO)
 # Render vai definir DEBUG = False. Localmente, será False a menos que você defina DEBUG=True.
