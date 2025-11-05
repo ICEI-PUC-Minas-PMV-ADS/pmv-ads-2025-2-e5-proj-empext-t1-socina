@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ produto.nome }} - SOCINA{% endblock %}
+
+{% block content %}
+<div class="py-12">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden md:flex">
+        <div class="md:w-1/2">
+            {% if produto.imagem %}
+                <img class="h-full w-full object-cover" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+            {% else %}
+                <div class="h-full w-full bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-500">Sem Imagem</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="md:w-1/2 p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2" style="font-family: 'Montserrat', sans-serif;">{{ produto.nome }}</h1>
+            <p class="text-2xl text-socina-pink-dark font-bold mb-4">R$ {{ produto.preco }}</p>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Descrição</h3>
+                <p class="text-gray-600">{{ produto.descricao|linebreaks }}</p>
+            </div>
+            
+            {% if produto.quantidade_estoque > 0 %}
+                <p class="text-sm text-green-600 mb-4">Em estoque ({{ produto.quantidade_estoque }} unidades)</p>
+                <a href="{% url 'adicionar_ao_carrinho' produto.pk %}" class="w-full text-center bg-socina-pink-dark text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
+                    Adicionar ao Carrinho
+                </a>
+            {% else %}
+                <p class="text-sm text-red-600 mb-4">Produto esgotado</p>
+                <button class="w-full text-center bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed" disabled>
+                    Esgotado
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,10 +2,16 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 
+# Imports para servir arquivos de mídia em desenvolvimento
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     # Páginas do Cliente
     path('', views.home, name='home'),
     path('catalogo/', views.catalogo, name='catalogo'),
+    # Rota de Detalhe do Produto
+    path('produto/<int:pk>/', views.produto_detalhe_view, name='produto_detalhe'),
 
     # Autenticação de Cliente
     path('cadastro/', views.cadastro_view, name='cadastro'),
@@ -24,6 +30,14 @@ urlpatterns = [
     path('admin/produtos/editar/<int:pk>/', views.edita_produto, name='edita_produto'),
     path('admin/produtos/deletar/<int:pk>/', views.deleta_produto, name='deleta_produto'),
 
+    # --- ROTAS DO DASHBOARD QUE FALTAVAM ---
+    path('admin/dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
+    path('admin/exportar-relatorio/', views.exportar_relatorio_csv, name='exportar_relatorio_csv'),
+
     # Django Admin (nativo)
     path('admin/', admin.site.urls),
 ]
+
+# Adiciona a rota para servir arquivos de mídia (fotos dos produtos)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

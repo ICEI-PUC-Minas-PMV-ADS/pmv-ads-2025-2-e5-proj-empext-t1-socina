@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="py-12">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-4xl font-bold text-socina-pink-dark">Dashboard de Vendas</h2>
+        <a href="{% url 'exportar_relatorio_csv' %}" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
+            Exportar Relatório (CSV)
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-gray-600">Vendas Totais</h3>
+            <p class="text-3xl font-bold text-gray-900">R$ {{ total_vendas_geral|floatformat:2 }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-gray-600">Total de Pedidos</h3>
+            <p class="text-3xl font-bold text-gray-900">{{ total_pedidos }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Vendas por Mês</h3>
+        <canvas id="vendasChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('vendasChart');
+    new Chart(ctx, {
+        type: 'bar', // Tipo de gráfico (barra)
+        data: {
+            labels: JSON.parse('{{ labels|safe }}'), // Meses (ex: "Novembro/2025")
+            datasets: [{
+                label: 'Total Vendido (R$)',
+                data: JSON.parse('{{ data|safe }}'), // Valores (ex: [150.50, ...])
+                backgroundColor: 'rgba(254, 204, 205, 0.6)', // Cor socina-pink-light
+                borderColor: 'rgba(255, 0, 110, 1)', // Cor socina-pink-dark
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        // Formata o eixo Y para mostrar "R$ 100,00"
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

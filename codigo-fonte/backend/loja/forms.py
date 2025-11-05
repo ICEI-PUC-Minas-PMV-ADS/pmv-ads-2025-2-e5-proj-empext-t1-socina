@@ -1,10 +1,11 @@
 from django import forms
-from .models import Produto
+from .models import Produto, Pedido
 
 class ProdutoForm(forms.ModelForm):
     class Meta:
         model = Produto
-        fields = ['nome', 'descricao', 'preco', 'quantidade_estoque', 'categoria']
+        # ADICIONADO 'imagem'
+        fields = ['nome', 'descricao', 'imagem', 'preco', 'quantidade_estoque', 'categoria']
 
 class CEPForm(forms.Form):
     cep = forms.CharField(

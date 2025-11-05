@@ -4,6 +4,17 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from decimal import Decimal
+
+# Imports para o Dashboard e Relatórios
+import csv
+import json
+from django.http import HttpResponse
+from django.db.models.functions import TruncMonth
+from django.db.models import Sum
+from django.utils import timezone
+from django.contrib.admin.views.decorators import staff_member_required
+
+# Imports dos seus Modelos e Formulários
 from .models import Produto, Pedido, ItemPedido, Cliente
 from .forms import ProdutoForm, CEPForm
 
@@ -14,6 +25,13 @@ def home(request):
 def catalogo(request):
     produtos = Produto.objects.filter(quantidade_estoque__gt=0)
     return render(request, 'catalogo.html', {'produtos': produtos})
+
+def produto_detalhe_view(request, pk):
+    produto = get_object_or_404(Produto, pk=pk)
+    contexto = {
+        'produto': produto
+    }
+    return render(request, 'produto_detalhe.html', contexto)
 
 # --- Autenticação de Cliente ---
 def cadastro_view(request):
@@ -48,39 +66,14 @@ def logout_view(request):
     return redirect('home')
 
 
-# --- Lógica do Carrinho e Frete ---
+# --- Lógica do Carrinho e Frete Fixo ---
 def ver_carrinho(request):
     carrinho = request.session.get('carrinho', {})
     itens_carrinho = []
     subtotal_pedido = Decimal('0.0')
-    form = CEPForm()
     
-    # Recupera o frete da sessão, converte para Decimal
-    valor_frete = Decimal(str(request.session.get('valor_frete', 0.0)))
-
-    # Cálculo do frete via CEP
-    if request.method == 'POST':
-        form = CEPForm(request.POST)
-        if form.is_valid():
-            cep_destino = form.cleaned_data['cep']
-            cep_origem = '32450000'  # CEP da loja
-            peso_kg = '0.5'
-            comprimento, altura, largura = 20, 10, 15
-
-            # Aqui você deve chamar a API real de frete ou seu mock
-            # Exemplo: substitua pelo código de cálculo correto
-            try:
-                # MOCK do frete: R$ 15,50
-                valor_frete = Decimal('15.50')
-                # Armazena na sessão como float
-                request.session['valor_frete'] = float(valor_frete)
-            except Exception as e:
-                print(f"Erro ao calcular frete: {e}")
-                messages.error(request, "Não foi possível calcular o frete. Verifique o CEP.")
-                valor_frete = Decimal('0.0')
-                request.session['valor_frete'] = 0.0
-
-    # Itens do carrinho
+    valor_frete = Decimal('15.50') # Nosso frete fixo
+    
     for produto_id, quantidade in carrinho.items():
         produto = get_object_or_404(Produto, id=int(produto_id))
         subtotal = produto.preco * quantidade
@@ -91,11 +84,10 @@ def ver_carrinho(request):
         })
         subtotal_pedido += subtotal
 
-    # Se o carrinho estiver vazio, zera o frete
     if not itens_carrinho:
-        valor_frete = Decimal('0.0')
-        request.session['valor_frete'] = 0.0
+        valor_frete = Decimal('0.0') 
 
+    request.session['valor_frete'] = str(valor_frete)
     total_geral = subtotal_pedido + valor_frete
 
     contexto = {
@@ -103,7 +95,7 @@ def ver_carrinho(request):
         'subtotal_pedido': subtotal_pedido,
         'valor_frete': valor_frete,
         'total_geral': total_geral,
-        'cep_form': form,
+        'cep_form': None, 
     }
     return render(request, 'carrinho.html', contexto)
 
@@ -133,14 +125,24 @@ def finalizar_pedido(request):
         return redirect('login')
 
     carrinho = request.session.get('carrinho', {})
-    valor_frete = Decimal(str(request.session.get('valor_frete', 0.0)))
+    valor_frete = Decimal(str(request.session.get('valor_frete', '0.0')))
 
     if not carrinho:
         return redirect('catalogo')
 
     try:
         with transaction.atomic():
-            cliente = Cliente.objects.get(usuario=request.user)
+            
+            # --- AQUI ESTÁ A CORREÇÃO ---
+            # Em vez de .get(), usamos .get_or_create().
+            # Isso busca o perfil do cliente. Se não existir (ex: é um admin),
+            # ele cria um perfil de cliente na hora.
+            cliente, created = Cliente.objects.get_or_create(
+                usuario=request.user, 
+                defaults={'endereco': 'Endereço Admin/Não informado'}
+            )
+            # --- FIM DA CORREÇÃO ---
+
             subtotal_pedido = Decimal('0.0')
             for produto_id, quantidade in carrinho.items():
                 produto = get_object_or_404(Produto, id=int(produto_id))
@@ -164,28 +166,29 @@ def finalizar_pedido(request):
                     subtotal=produto.preco * quantidade
                 )
                 produto.quantidade_estoque -= quantidade
-                produto.save()
+                produto.save() # Baixa no estoque
 
             del request.session['carrinho']
             del request.session['valor_frete']
+            
+            # Agora sim, você será enviado para a página de confirmação!
             return render(request, 'pedido_confirmado.html', {'pedido': pedido})
 
-    except Cliente.DoesNotExist:
-        messages.error(request, "Perfil de cliente não encontrado.")
-        return redirect('catalogo')
     except Exception as e:
         messages.error(request, f"Ocorreu um erro: {e}")
         return redirect('ver_carrinho')
 
 
-# --- CRUD de Produtos ---
+# --- CRUD de Produtos (Admin) ---
+@staff_member_required
 def lista_produtos(request):
     produtos = Produto.objects.all()
     return render(request, 'admin/lista_produtos.html', {'produtos': produtos})
 
+@staff_member_required
 def cadastra_produto(request):
     if request.method == 'POST':
-        form = ProdutoForm(request.POST)
+        form = ProdutoForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('lista_produtos')
@@ -193,10 +196,11 @@ def cadastra_produto(request):
         form = ProdutoForm()
     return render(request, 'admin/cadastra_produto.html', {'form': form})
 
+@staff_member_required
 def edita_produto(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     if request.method == 'POST':
-        form = ProdutoForm(request.POST, instance=produto)
+        form = ProdutoForm(request.POST, request.FILES, instance=produto)
         if form.is_valid():
             form.save()
             return redirect('lista_produtos')
@@ -204,7 +208,57 @@ def edita_produto(request, pk):
         form = ProdutoForm(instance=produto)
     return render(request, 'admin/cadastra_produto.html', {'form': form})
 
+@staff_member_required
 def deleta_produto(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     produto.delete()
     return redirect('lista_produtos')
+
+# --- Dashboard e Relatório (Admin) ---
+@staff_member_required
+def admin_dashboard_view(request):
+    vendas_por_mes = (
+        Pedido.objects
+        .annotate(mes=TruncMonth('data'))
+        .values('mes')
+        .annotate(total_vendido=Sum('total'))
+        .order_by('mes')
+    )
+    
+    labels_py = [venda['mes'].strftime('%B/%Y') for venda in vendas_por_mes]
+    data_py = [float(venda['total_vendido']) for venda in vendas_por_mes]
+    
+    labels = json.dumps(labels_py)
+    data = json.dumps(data_py)
+    
+    total_vendas_geral = Pedido.objects.aggregate(Sum('total'))['total__sum'] or 0
+    total_pedidos = Pedido.objects.count()
+
+    contexto = {
+        'labels': labels,
+        'data': data,
+        'total_vendas_geral': total_vendas_geral,
+        'total_pedidos': total_pedidos,
+    }
+    return render(request, 'admin/dashboard.html', contexto)
+
+@staff_member_required
+def exportar_relatorio_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="relatorio_vendas_{timezone.now().strftime("%Y-%m-%d")}.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Valor Frete', 'Total'])
+    
+    pedidos = Pedido.objects.all().select_related('cliente__usuario')
+    for pedido in pedidos:
+        writer.writerow([
+            pedido.id,
+            pedido.cliente.usuario.username,
+            pedido.data.strftime('%Y-%m-%d %H:%M'),
+            pedido.get_status_display(),
+            pedido.valor_frete,
+            pedido.total
+        ])
+        
+    return response

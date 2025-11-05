@@ -1,12 +1,24 @@
 from pathlib import Path
-import os # Importe o módulo 'os' no topo
+import os
+import dj_database_url  # NOVO: Importa o helper do banco de dados
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'sua_chave_secreta_aqui'
-DEBUG = True
+# CHAVE SECRETA (ALTERADO)
+# Vamos ler a chave do ambiente do Render. É mais seguro.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'sua_chave_secreta_padrao_insegura_para_testes_locais')
+
+# MODO DEBUG (ALTERADO)
+# Render vai definir DEBUG = False. Localmente, será False a menos que você defina DEBUG=True.
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# DOMÍNIOS PERMITIDOS (ALTERADO)
+# O Render vai te dar um domínio .onrender.com.
 ALLOWED_HOSTS = []
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 INSTALLED_APPS = [
@@ -15,12 +27,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # NOVO: Whitenoise para servir arquivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.staticfiles',
     'loja',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # NOVO: Whitenoise
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,32 +65,38 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'loja.wsgi.application'
 
-# Database
+# BANCO DE DADOS (ALTERADO)
+# O Render vai fornecer uma DATABASE_URL. Se não encontrar, usa o sqlite3.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = []
 
-# Internationalization
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- CONFIGURAÇÃO CORRIGIDA DE ARQUIVOS ESTÁTICOS ---
-# A URL para acessar os arquivos no navegador.
+# ARQUIVOS ESTÁTICOS (ALTERADO)
+# Onde o Django vai procurar seus assets (css, js, imagens)
 STATIC_URL = '/static/'
-
-# A lista de pastas onde o Django irá procurar por arquivos estáticos.
-# Esta é a linha que corrige o problema!
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'frontend'),
+    os.path.join(BASE_DIR.parent, 'frontend/assets'), # Caminho para sua pasta assets
 ]
-# ----------------------------------------------------
+# Onde o Render vai COLETAR todos os arquivos estáticos
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# NOVO: Armazenamento para o Whitenoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Default primary key field type
+# ARQUIVOS DE MÍDIA (Fotos dos produtos)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CHAVE DO MERCADO PAGO (Vamos ler do ambiente)
+MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', 'SUA_CHAVE_DE_TESTE_AQUI')

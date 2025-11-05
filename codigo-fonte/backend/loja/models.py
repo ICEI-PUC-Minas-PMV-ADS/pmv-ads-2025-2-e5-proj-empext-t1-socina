@@ -11,6 +11,8 @@ class Cliente(models.Model):
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField()
+    # NOVO CAMPO DE IMAGEM
+    imagem = models.ImageField(upload_to='produtos/', null=True, blank=True)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     quantidade_estoque = models.PositiveIntegerField()
     categoria = models.CharField(max_length=50)
@@ -28,7 +30,6 @@ class Pedido(models.Model):
     data = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='em andamento')
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # NOVO CAMPO PARA O FRETE
     valor_frete = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):

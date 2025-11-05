@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Cadastrar Produto{% endblock %}
+
+{% block content %}
+<div class="py-12 max-w-2xl mx-auto">
+    <h2 class="text-3xl font-bold text-center text-socina-pink-dark mb-8">Gerenciar Produto</h2>
+    
+    <form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                
+                {% if field.name == 'imagem' %}
+                    {{ field }}
+                {% else %}
+                <input 
+                    type="{{ field.field.widget.input_type }}" 
+                    name="{{ field.name }}" 
+                    id="{{ field.id_for_label }}"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    {% if field.value %}value="{{ field.value }}"{% endif %}>
+                {% endif %}
+
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p class="text-red-500 text-xs italic">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit" class="w-full bg-socina-pink-dark text-white font-bold py-2 px-4 rounded hover:opacity-90">
+            Salvar Produto
+        </button>
+    </form>
+</div>
+{% endblock %}
