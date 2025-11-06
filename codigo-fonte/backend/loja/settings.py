@@ -10,15 +10,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'FAKE_KEY_PARA_RODAR_LOCAL')
 # Modo Debug lido do ambiente
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# --- CORREÇÃO AQUI ---
-# DOMÍNIOS PERMITIDOS (ALTERADO)
+# Domínios permitidos (com a correção anterior)
 ALLOWED_HOSTS = [
     '127.0.0.1', # Permite o health check interno do Render
 ]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-# --- FIM DA CORREÇÃO ---
 
 # Application definition
 INSTALLED_APPS = [
@@ -78,11 +76,14 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Arquivos Estáticos
+# --- CORREÇÃO AQUI ---
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'frontend/assets'),
+    # O caminho correto é para 'frontend', para que o Django encontre 'frontend/assets/...'
+    os.path.join(BASE_DIR.parent, 'frontend'),
 ]
+# --- FIM DA CORREÇÃO ---
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
