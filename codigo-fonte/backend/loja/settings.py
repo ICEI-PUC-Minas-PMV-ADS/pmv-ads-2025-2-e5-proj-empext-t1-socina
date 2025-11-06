@@ -4,14 +4,21 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Chave secreta lida do ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY', 'FAKE_KEY_PARA_RODAR_LOCAL')
 
+# Modo Debug lido do ambiente
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+# --- CORREÇÃO AQUI ---
+# DOMÍNIOS PERMITIDOS (ALTERADO)
+ALLOWED_HOSTS = [
+    '127.0.0.1', # Permite o health check interno do Render
+]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# --- FIM DA CORREÇÃO ---
 
 # Application definition
 INSTALLED_APPS = [
@@ -20,18 +27,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # --- CORREÇÃO AQUI ---
-    # Esta é a app, necessária para o storage e collectstatic
-    'whitenoise',
-    # ---------------------
+    'whitenoise', # Correto
     'django.contrib.staticfiles',
     'loja',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # Esta linha está correta e deve ficar aqui
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Correto
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,6 +63,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'loja.wsgi.application'
 
+# Banco de dados (lido do ambiente)
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -74,6 +78,7 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
+# Arquivos Estáticos
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR.parent, 'frontend/assets'),
@@ -81,9 +86,11 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Arquivos de Mídia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Chave do Mercado Pago (lida do ambiente)
 MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', 'FAKE_TOKEN_PARA_RODAR_LOCAL')
