@@ -16,10 +16,15 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .models import Produto, Pedido, ItemPedido, Cliente
 from .forms import ProdutoForm
 
-# --- PÁGINAS PÚBLICAS ---
+# --- HOME AGORA É O ADMIN ---
 def home(request):
-    return render(request, 'index.html')
+    """
+    Quando o usuário acessar a raiz do site (socina.onrender.com),
+    ele será enviado imediatamente para a tela de login do Admin (/admin/).
+    """
+    return redirect('/admin/')
 
+# --- PÁGINAS DO CLIENTE ---
 def catalogo(request):
     produtos = Produto.objects.filter(quantidade_estoque__gt=0)
     return render(request, 'catalogo.html', {'produtos': produtos})
@@ -28,7 +33,7 @@ def produto_detalhe_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     return render(request, 'produto_detalhe.html', {'produto': produto})
 
-# --- AUTENTICAÇÃO ---
+# --- AUTENTICAÇÃO (CLIENTES) ---
 def cadastro_view(request):
     if request.user.is_authenticated:
         return redirect('catalogo')
@@ -58,6 +63,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    # Ao sair, volta para a home (que vai mandar para o admin login)
     return redirect('home')
 
 # --- CARRINHO E CHECKOUT ---
@@ -67,14 +73,17 @@ def ver_carrinho(request):
     subtotal_pedido = Decimal('0.0')
     
     for produto_id, quantidade in carrinho.items():
-        produto = get_object_or_404(Produto, id=int(produto_id))
-        subtotal = produto.preco * quantidade
-        subtotal_pedido += subtotal
-        itens_carrinho.append({
-            'produto': produto,
-            'quantidade': quantidade,
-            'subtotal': subtotal
-        })
+        try:
+            produto = Produto.objects.get(id=int(produto_id))
+            subtotal = produto.preco * quantidade
+            subtotal_pedido += subtotal
+            itens_carrinho.append({
+                'produto': produto,
+                'quantidade': quantidade,
+                'subtotal': subtotal
+            })
+        except Produto.DoesNotExist:
+            continue
 
     if not itens_carrinho:
         valor_frete = Decimal('0.0')
@@ -164,7 +173,8 @@ def finalizar_pedido_whatsapp(request):
                 prod.save()
 
             del request.session['carrinho']
-            del request.session['valor_frete']
+            if 'valor_frete' in request.session:
+                del request.session['valor_frete']
 
             texto = f"Olá! Acabei de fazer o pedido *#{pedido.id}* pelo site SOCINA. 💕\n\n"
             texto += "*Resumo do Pedido:*\n"
@@ -173,10 +183,7 @@ def finalizar_pedido_whatsapp(request):
             
             texto += "\n--------------------------------\n"
             texto += f"📦 Subtotal: R$ {subtotal_pedido:.2f}\n"
-            if valor_frete == 0:
-                texto += "🚚 Frete: GRÁTIS\n"
-            else:
-                texto += f"🚚 Frete: R$ {valor_frete:.2f}\n"
+            texto += f"🚚 Frete: R$ {valor_frete:.2f}\n"
             texto += f"💰 *TOTAL: R$ {total_geral:.2f}*\n"
             texto += "\nAguardo a chave PIX para pagamento!"
 
@@ -190,71 +197,43 @@ def finalizar_pedido_whatsapp(request):
         messages.error(request, f"Erro ao processar pedido: {e}")
         return redirect('ver_carrinho')
 
-# --- DASHBOARD DE GESTÃO (A Função que faltava!) ---
+# --- FUNCIONALIDADES EXTRAS (DASHBOARD/EXPORTAR) ---
 @staff_member_required
 def admin_dashboard_view(request):
-    """Exibe indicadores e gráfico."""
     total_pedidos = Pedido.objects.count()
-
     pedidos_concluidos = Pedido.objects.filter(status='concluido')
     total_vendas_valor = pedidos_concluidos.aggregate(Sum('total'))['total__sum'] or 0
     total_vendas_qtd = pedidos_concluidos.count()
 
     vendas_mensais = (
-        Pedido.objects
-        .filter(status='concluido')
+        Pedido.objects.filter(status='concluido')
         .annotate(mes=TruncMonth('data'))
-        .values('mes')
-        .annotate(faturamento=Sum('total'))
-        .order_by('mes')
+        .values('mes').annotate(faturamento=Sum('total')).order_by('mes')
     )
-
-    labels_grafico = []
-    data_grafico = []
-
-    for venda in vendas_mensais:
-        if venda['mes']:
-            nome_mes = venda['mes'].strftime('%m/%Y') 
-            labels_grafico.append(nome_mes)
-            data_grafico.append(float(venda['faturamento']))
+    labels = [v['mes'].strftime('%m/%Y') for v in vendas_mensais if v['mes']]
+    data = [float(v['faturamento']) for v in vendas_mensais if v['mes']]
 
     contexto = {
         'total_pedidos': total_pedidos,
         'total_vendas_qtd': total_vendas_qtd,
         'total_vendas_valor': total_vendas_valor,
-        'chart_labels': json.dumps(labels_grafico),
-        'chart_data': json.dumps(data_grafico),
+        'chart_labels': json.dumps(labels),
+        'chart_data': json.dumps(data),
     }
-
     return render(request, 'admin/dashboard.html', contexto)
 
-# --- RELATÓRIO CSV (A Função que faltava!) ---
 @staff_member_required
 def exportar_relatorio_csv(request):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="relatorio_vendas_socina.csv"'
-
+    response['Content-Disposition'] = 'attachment; filename="relatorio.csv"'
     writer = csv.writer(response)
-    writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Frete', 'Total', 'Produtos'])
-
-    pedidos = Pedido.objects.all().order_by('-data')
-
-    for pedido in pedidos:
-        itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in pedido.itens.all()])
-        data_formatada = pedido.data.strftime('%d/%m/%Y %H:%M')
-        writer.writerow([
-            pedido.id,
-            pedido.cliente.usuario.username,
-            data_formatada,
-            pedido.get_status_display(),
-            pedido.valor_frete,
-            pedido.total,
-            itens_str
-        ])
-
+    writer.writerow(['ID', 'Cliente', 'Data', 'Total', 'Status'])
+    for p in Pedido.objects.all().order_by('-data'):
+        cli = p.cliente.usuario.username if p.cliente and p.cliente.usuario else "Anônimo"
+        writer.writerow([p.id, cli, p.data, p.total, p.status])
     return response
 
-# --- CRUD ADMIN (PRODUTOS) ---
+# Views de CRUD legadas (Opcionais se usar só o Admin)
 @staff_member_required
 def lista_produtos(request):
     produtos = Produto.objects.all()
@@ -264,27 +243,20 @@ def lista_produtos(request):
 def cadastra_produto(request):
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_produtos')
-    else:
-        form = ProdutoForm()
+        if form.is_valid(): form.save(); return redirect('lista_produtos')
+    else: form = ProdutoForm()
     return render(request, 'admin/cadastra_produto.html', {'form': form})
 
 @staff_member_required
 def edita_produto(request, pk):
-    produto = get_object_or_404(Produto, pk=pk)
+    p = get_object_or_404(Produto, pk=pk)
     if request.method == 'POST':
-        form = ProdutoForm(request.POST, request.FILES, instance=produto)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_produtos')
-    else:
-        form = ProdutoForm(instance=produto)
+        form = ProdutoForm(request.POST, request.FILES, instance=p)
+        if form.is_valid(): form.save(); return redirect('lista_produtos')
+    else: form = ProdutoForm(instance=p)
     return render(request, 'admin/cadastra_produto.html', {'form': form})
 
 @staff_member_required
 def deleta_produto(request, pk):
-    produto = get_object_or_404(Produto, pk=pk)
-    produto.delete()
+    get_object_or_404(Produto, pk=pk).delete()
     return redirect('lista_produtos')

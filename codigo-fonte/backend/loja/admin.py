@@ -1,40 +1,23 @@
 from django.contrib import admin
-from .models import Produto, Cliente, Pedido, ItemPedido
+from .models import Produto, Pedido, ItemPedido, Cliente
 
-# -----------------------------------------------------
-# 1. ADMIN INLINE para ver Itens do Pedido
-# -----------------------------------------------------
+# Configuração para mostrar itens DENTRO do pedido
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
-    extra = 0  # Não mostra linhas vazias extras
-    readonly_fields = ('produto', 'quantidade', 'subtotal') # Opcional: evita edição acidental
-
-# -----------------------------------------------------
-# 2. ADMIN REGISTERS
-# -----------------------------------------------------
-
-@admin.register(Produto)
-class ProdutoAdmin(admin.ModelAdmin):
-    # Exibe colunas importantes
-    list_display = ("nome", "preco", "quantidade_estoque") 
-    
-    # IMPORTANTE: A vírgula no final é OBRIGATÓRIA para o Python entender que é uma tupla
-    list_filter = ("preco",) 
-    
-    search_fields = ("nome", "descricao")
-
-@admin.register(Cliente)
-class ClienteAdmin(admin.ModelAdmin):
-    list_display = ("usuario", "endereco")
+    extra = 0
+    readonly_fields = ('subtotal',)
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    # Adiciona a lista de itens dentro do pedido
-    inlines = [
-        ItemPedidoInline,
-    ]
-    list_display = ("id", "cliente", "data", "status", "total")
-    list_filter = ("status", "data")
-    search_fields = ("cliente__usuario__username", "id")
+    list_display = ('id', 'cliente', 'data', 'total', 'status')
+    list_filter = ('status', 'data')
+    inlines = [ItemPedidoInline]
 
-# ItemPedido já aparece dentro de Pedido, então não precisa de registro isolado.
+@admin.register(Produto)
+class ProdutoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'preco', 'quantidade_estoque')
+    search_fields = ('nome',)
+
+# Registra os outros modelos simples
+admin.site.register(Cliente)
+admin.site.register(ItemPedido)
