@@ -46,8 +46,7 @@
                     <li><a href="{% url 'ver_carrinho' %}" class="hover:text-socina-pink-dark">Carrinho</a></li>
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
-                             <li><a href="{% url 'admin_dashboard' %}" class="hover:text-socina-pink-dark">Dashboard</a></li>
-                        {% endif %}
+                            <li> <a href="{% url 'admin:index' %}" class="hover:text-socina-pink-dark"> Painel de Controle</a></li>
                         <li class="font-normal">Olá, {{ user.username }}</li>
                         <li><a href="{% url 'logout' %}" class="hover:text-socina-pink-dark">Logout</a></li>
                     {% else %}
