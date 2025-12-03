@@ -1,19 +1,22 @@
+import json
+import csv
+import urllib.parse
+from decimal import Decimal
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from decimal import Decimal
-import urllib.parse 
-import csv
-from django.http import HttpResponse
 
 # Imports dos seus Modelos e Formulários
 from .models import Produto, Pedido, ItemPedido, Cliente
 from .forms import ProdutoForm
 
-# --- Páginas Públicas ---
+# --- PÁGINAS PÚBLICAS ---
 def home(request):
     return render(request, 'index.html')
 
@@ -25,7 +28,7 @@ def produto_detalhe_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     return render(request, 'produto_detalhe.html', {'produto': produto})
 
-# --- Autenticação ---
+# --- AUTENTICAÇÃO ---
 def cadastro_view(request):
     if request.user.is_authenticated:
         return redirect('catalogo')
@@ -57,13 +60,12 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-# --- Carrinho e Finalização ---
+# --- CARRINHO E CHECKOUT ---
 def ver_carrinho(request):
     carrinho = request.session.get('carrinho', {})
     itens_carrinho = []
     subtotal_pedido = Decimal('0.0')
     
-    # Busca produtos e calcula subtotal
     for produto_id, quantidade in carrinho.items():
         produto = get_object_or_404(Produto, id=int(produto_id))
         subtotal = produto.preco * quantidade
@@ -74,7 +76,6 @@ def ver_carrinho(request):
             'subtotal': subtotal
         })
 
-    # Lógica de Frete (Grátis acima de 600, senão 15.00)
     if not itens_carrinho:
         valor_frete = Decimal('0.0')
     elif subtotal_pedido >= 600:
@@ -83,8 +84,6 @@ def ver_carrinho(request):
         valor_frete = Decimal('15.00')
 
     total_geral = subtotal_pedido + valor_frete
-
-    # Salva valores na sessão para usar na finalização
     request.session['valor_frete'] = str(valor_frete)
 
     contexto = {
@@ -101,13 +100,12 @@ def adicionar_ao_carrinho(request, pk):
     carrinho = request.session.get('carrinho', {})
     produto_id = str(pk)
     
-    # Lógica simples de estoque
     qtd_atual = carrinho.get(produto_id, 0)
     if qtd_atual + 1 <= produto.quantidade_estoque:
         carrinho[produto_id] = qtd_atual + 1
         request.session['carrinho'] = carrinho
     else:
-        messages.warning(request, 'Estoque máximo atingido para este item.')
+        messages.warning(request, 'Estoque máximo atingido.')
         
     return redirect('ver_carrinho')
 
@@ -120,9 +118,6 @@ def remover_do_carrinho(request, pk):
     return redirect('ver_carrinho')
 
 def finalizar_pedido_whatsapp(request):
-    """
-    Salva o pedido no banco de dados e redireciona para o WhatsApp.
-    """
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -134,15 +129,13 @@ def finalizar_pedido_whatsapp(request):
 
     try:
         with transaction.atomic():
-            # 1. Garante que o cliente existe
             cliente, created = Cliente.objects.get_or_create(
                 usuario=request.user, 
                 defaults={'endereco': 'Endereço não informado'}
             )
 
-            # 2. Recalcula totais (segurança)
             subtotal_pedido = Decimal('0.0')
-            itens_obj = [] # Lista temporária para montar a msg do Zap
+            itens_obj = []
             
             for produto_id, quantidade in carrinho.items():
                 produto = Produto.objects.get(id=int(produto_id))
@@ -152,15 +145,13 @@ def finalizar_pedido_whatsapp(request):
             
             total_geral = subtotal_pedido + valor_frete
 
-            # 3. Cria o Pedido no Banco
             pedido = Pedido.objects.create(
                 cliente=cliente,
                 total=total_geral,
                 valor_frete=valor_frete,
-                status='em andamento' # Ou 'Pendente Pagamento'
+                status='em andamento' 
             )
 
-            # 4. Cria os Itens e Baixa Estoque
             for item in itens_obj:
                 ItemPedido.objects.create(
                     pedido=pedido,
@@ -168,36 +159,29 @@ def finalizar_pedido_whatsapp(request):
                     quantidade=item['qtd'],
                     subtotal=item['sub']
                 )
-                # Baixa no estoque
                 prod = item['produto']
                 prod.quantidade_estoque -= item['qtd']
                 prod.save()
 
-            # 5. Limpa Sessão
             del request.session['carrinho']
             del request.session['valor_frete']
 
-            # 6. Monta Mensagem do WhatsApp
             texto = f"Olá! Acabei de fazer o pedido *#{pedido.id}* pelo site SOCINA. 💕\n\n"
             texto += "*Resumo do Pedido:*\n"
-            
             for item in itens_obj:
                 texto += f"▪ {item['produto'].nome} ({item['qtd']}x): R$ {item['sub']:.2f}\n"
             
             texto += "\n--------------------------------\n"
             texto += f"📦 Subtotal: R$ {subtotal_pedido:.2f}\n"
-            
             if valor_frete == 0:
                 texto += "🚚 Frete: GRÁTIS\n"
             else:
                 texto += f"🚚 Frete: R$ {valor_frete:.2f}\n"
-                
             texto += f"💰 *TOTAL: R$ {total_geral:.2f}*\n"
             texto += "\nAguardo a chave PIX para pagamento!"
 
-            # 7. Redireciona
             texto_encoded = urllib.parse.quote(texto)
-            numero_whatsapp = "5531971741924" # <--- INSIRA O NÚMERO CORRETO AQUI
+            numero_whatsapp = "553192742082"
             link_zap = f"https://wa.me/{numero_whatsapp}?text={texto_encoded}"
             
             return redirect(link_zap)
@@ -206,7 +190,71 @@ def finalizar_pedido_whatsapp(request):
         messages.error(request, f"Erro ao processar pedido: {e}")
         return redirect('ver_carrinho')
 
-# --- CRUD Admin (Mantido igual) ---
+# --- DASHBOARD DE GESTÃO (A Função que faltava!) ---
+@staff_member_required
+def admin_dashboard_view(request):
+    """Exibe indicadores e gráfico."""
+    total_pedidos = Pedido.objects.count()
+
+    pedidos_concluidos = Pedido.objects.filter(status='concluido')
+    total_vendas_valor = pedidos_concluidos.aggregate(Sum('total'))['total__sum'] or 0
+    total_vendas_qtd = pedidos_concluidos.count()
+
+    vendas_mensais = (
+        Pedido.objects
+        .filter(status='concluido')
+        .annotate(mes=TruncMonth('data'))
+        .values('mes')
+        .annotate(faturamento=Sum('total'))
+        .order_by('mes')
+    )
+
+    labels_grafico = []
+    data_grafico = []
+
+    for venda in vendas_mensais:
+        if venda['mes']:
+            nome_mes = venda['mes'].strftime('%m/%Y') 
+            labels_grafico.append(nome_mes)
+            data_grafico.append(float(venda['faturamento']))
+
+    contexto = {
+        'total_pedidos': total_pedidos,
+        'total_vendas_qtd': total_vendas_qtd,
+        'total_vendas_valor': total_vendas_valor,
+        'chart_labels': json.dumps(labels_grafico),
+        'chart_data': json.dumps(data_grafico),
+    }
+
+    return render(request, 'admin/dashboard.html', contexto)
+
+# --- RELATÓRIO CSV (A Função que faltava!) ---
+@staff_member_required
+def exportar_relatorio_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="relatorio_vendas_socina.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Frete', 'Total', 'Produtos'])
+
+    pedidos = Pedido.objects.all().order_by('-data')
+
+    for pedido in pedidos:
+        itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in pedido.itens.all()])
+        data_formatada = pedido.data.strftime('%d/%m/%Y %H:%M')
+        writer.writerow([
+            pedido.id,
+            pedido.cliente.usuario.username,
+            data_formatada,
+            pedido.get_status_display(),
+            pedido.valor_frete,
+            pedido.total,
+            itens_str
+        ])
+
+    return response
+
+# --- CRUD ADMIN (PRODUTOS) ---
 @staff_member_required
 def lista_produtos(request):
     produtos = Produto.objects.all()
@@ -240,38 +288,3 @@ def deleta_produto(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     produto.delete()
     return redirect('lista_produtos')
-
-@staff_member_required
-def exportar_relatorio_csv(request):
-    """
-    Gera um arquivo CSV com todos os pedidos para a dona baixar.
-    """
-    # Cria a resposta do tipo CSV
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="relatorio_vendas_socina.csv"'
-
-    writer = csv.writer(response)
-    # Cabeçalho das colunas
-    writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Frete', 'Total', 'Produtos'])
-
-    # Busca os pedidos
-    pedidos = Pedido.objects.all().order_by('-data')
-
-    for pedido in pedidos:
-        # Cria uma lista de produtos num texto só (ex: "Camisa (2), Calça (1)")
-        itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in pedido.itens.all()])
-        
-        # Formata a data
-        data_formatada = pedido.data.strftime('%d/%m/%Y %H:%M')
-
-        writer.writerow([
-            pedido.id,
-            pedido.cliente.usuario.username,
-            data_formatada,
-            pedido.get_status_display(),
-            pedido.valor_frete,
-            pedido.total,
-            itens_str
-        ])
-
-    return response
