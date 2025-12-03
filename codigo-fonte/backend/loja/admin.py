@@ -2,14 +2,12 @@ from django.contrib import admin
 from .models import Produto, Cliente, Pedido, ItemPedido
 
 # -----------------------------------------------------
-# 1. ADMIN INLINE para ver Itens do Pedido (Passo 2)
+# 1. ADMIN INLINE para ver Itens do Pedido
 # -----------------------------------------------------
-# Permite que a lista de ItemPedido apareça dentro da tela de Pedido.
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
-    extra = 0  # Não mostra linhas vazias por padrão
-    # Opcional: torna esses campos somente leitura para evitar edição acidental do preço/produto
-    readonly_fields = ('produto', 'quantidade', 'subtotal') 
+    extra = 0  # Não mostra linhas vazias extras
+    readonly_fields = ('produto', 'quantidade', 'subtotal') # Opcional: evita edição acidental
 
 # -----------------------------------------------------
 # 2. ADMIN REGISTERS
@@ -17,10 +15,12 @@ class ItemPedidoInline(admin.TabularInline):
 
 @admin.register(Produto)
 class ProdutoAdmin(admin.ModelAdmin):
-    # Melhoria: Adiciona 'categoria' na lista de exibição (Passo 1)
-    list_display = ("nome", "preco", "quantidade_estoque", "categoria") 
-    # Adiciona filtros laterais
-    list_filter = ("categoria", "em_promocao")
+    # Exibe colunas importantes
+    list_display = ("nome", "preco", "quantidade_estoque") 
+    
+    # IMPORTANTE: A vírgula no final é OBRIGATÓRIA para o Python entender que é uma tupla
+    list_filter = ("preco",) 
+    
     search_fields = ("nome", "descricao")
 
 @admin.register(Cliente)
@@ -29,7 +29,7 @@ class ClienteAdmin(admin.ModelAdmin):
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    # Melhoria: Adiciona o Inline para exibir os ItensPedido (Passo 2)
+    # Adiciona a lista de itens dentro do pedido
     inlines = [
         ItemPedidoInline,
     ]
@@ -37,7 +37,4 @@ class PedidoAdmin(admin.ModelAdmin):
     list_filter = ("status", "data")
     search_fields = ("cliente__usuario__username", "id")
 
-# Remove o registro separado do ItemPedido, já que ele é exibido via Inline
-# @admin.register(ItemPedido) 
-# class ItemPedidoAdmin(admin.ModelAdmin):
-#     list_display = ("pedido", "produto", "quantidade", "subtotal")
+# ItemPedido já aparece dentro de Pedido, então não precisa de registro isolado.
