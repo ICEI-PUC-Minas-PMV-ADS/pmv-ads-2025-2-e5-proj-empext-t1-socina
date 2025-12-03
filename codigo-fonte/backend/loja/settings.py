@@ -18,17 +18,55 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Application definition
 INSTALLED_APPS = [
+    'jazzmin',  # <--- OBRIGATÓRIO: Deve ser o primeiro da lista
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise', # Correto
     'django.contrib.staticfiles',
     'loja',
 ]
+JAZZMIN_SETTINGS = {
+    "site_title": "SOCINA Admin",
+    "site_header": "SOCINA",
+    "site_brand": "SOCINA",
+    "welcome_sign": "Painel Gerencial - SOCINA",
+    "copyright": "Socina Ltd",
+    "search_model": "auth.User",
+    "topmenu_links": [
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Ver Loja (Site)", "url": "/", "new_window": True},
+    ],
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-pink", 
+    "accent": "accent-pink",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "theme": "default", 
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,18 +114,18 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- CORREÇÃO AQUI ---
+# --- ARQUIVOS ESTÁTICOS ---
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    # O caminho correto é para 'frontend', para que o Django encontre 'frontend/assets/...'
-    os.path.join(BASE_DIR.parent, 'frontend'),
+    # O caminho correto para o Django encontrar a pasta 'assets' dentro de 'frontend'
+    os.path.join(BASE_DIR.parent, 'frontend/assets'),
 ]
-# --- FIM DA CORREÇÃO ---
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Arquivos de Mídia
+# --- ARQUIVOS DE MÍDIA (Imagens dos Produtos) ---
+# Media Root deve apontar para a pasta 'media' que está FORA de 'backend' (no mesmo nível de 'frontend')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
 
