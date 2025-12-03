@@ -1,0 +1,26 @@
+/* Definição das suas cores e fontes personalizadas */
+:root {
+    --primary-color: #fecccd; /* Seu rosa principal */
+    --pink-color: #ff006e;    /* Seu rosa mais forte */
+    --white-color: #FFFFFF;
+}
+
+body {
+    font-family: 'Ubuntu', sans-serif; 
+    /* Ajuste para o menu fixo não cobrir o conteúdo */
+    padding-top: 80px; /* Altura aproximada do seu menu */
+}
+
+/* --- CORREÇÃO AQUI --- */
+/* Classe para a imagem de fundo da página inicial */
+.hero-bg {
+    /* O caminho ../images/ sobe um nível (de css para assets) e entra em images */
+    background-image: url('../images/main-bg3.jpg');
+}
+
+/* Classe para os ícones de benefícios */
+.benefit-icon {
+    height: 48px; /* Define uma altura fixa para os ícones */
+    width: 48px;  /* Define uma largura fixa para os ícones */
+    margin: 0 auto 1rem; /* Centraliza o ícone e adiciona espaço abaixo */
+}

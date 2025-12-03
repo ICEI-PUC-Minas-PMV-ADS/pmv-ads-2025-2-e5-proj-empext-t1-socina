@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
-# Exit on error
+# exit on error
 set -o errexit
 
-# Instala as dependências
-pip install -r requirements.txt
+# 1. Instalar as dependências
+# (Ajuste o caminho se o requirements.txt estiver dentro de backend)
+pip install -r codigo-fonte/backend/requirements.txt
 
-# Coleta os arquivos estáticos
-python manage.py collectstatic --no-input
+# 2. Entrar na pasta onde está o manage.py
+cd codigo-fonte/backend
 
-# Roda as migrações do banco de dados
+# 3. Coletar os arquivos estáticos (CSS/Imagens)
+python manage.py collectstatic --noinput
+
+# 4. Criar/Atualizar as tabelas do banco
 python manage.py migrate
-
-# --- NOVO CÓDIGO AQUI ---
-# Cria o superusuário lendo as variáveis de ambiente que você acabou de criar.
-# O '|| true' no final é um truque para o build não falhar se o usuário já existir.
-python manage.py createsuperuser --noinput || true
