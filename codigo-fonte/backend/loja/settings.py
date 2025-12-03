@@ -2,22 +2,32 @@ from pathlib import Path
 import os
 import dj_database_url
 
+# --- CAMINHOS ---
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Chave secreta lida do ambiente
-SECRET_KEY = os.environ.get('SECRET_KEY', 'FAKE_KEY_PARA_RODAR_LOCAL')
+# --- SEGURANÇA ---
+# Em produção (Render), a chave vem das variáveis de ambiente. Localmente usa a fake.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-padrao-para-desenvolvimento-local')
 
-# Modo Debug lido do ambiente
+# DEBUG:
+# No Render, defina a variável de ambiente DEBUG = True para ver os erros.
+# Se não estiver definido, assume False (Produção).
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Domínios permitidos (com a correção anterior)
 ALLOWED_HOSTS = [
-    '127.0.0.1', # Permite o health check interno do Render
+    '127.0.0.1', 
+    'localhost',
+    '.onrender.com' # Aceita qualquer subdomínio do Render
 ]
+
+# Adiciona o host externo do Render se existir
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+
+# --- APPS INSTALADOS ---
 INSTALLED_APPS = [
     'jazzmin',  # <--- OBRIGATÓRIO: Deve ser o primeiro da lista
     'django.contrib.admin',
@@ -26,8 +36,101 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Seus Apps
     'loja',
 ]
+
+# --- MIDDLEWARE ---
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # <--- Essencial para estáticos no Render
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'loja.urls'
+
+# --- TEMPLATES (HTML) ---
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            # Garante que o Django ache a pasta templates dentro da pasta loja
+            os.path.join(BASE_DIR, 'loja', 'templates'),
+        ],
+        'APP_DIRS': True, # Procura templates dentro de cada app instalado
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'loja.wsgi.application'
+
+
+# --- BANCO DE DADOS ---
+# Tenta pegar do Render (DATABASE_URL). Se não tiver, usa SQLite local.
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
+}
+
+
+# --- VALIDAÇÃO DE SENHA ---
+AUTH_PASSWORD_VALIDATORS = [
+    { 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
+]
+
+
+# --- INTERNACIONALIZAÇÃO ---
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
+USE_I18N = True
+USE_TZ = True
+
+
+# --- ARQUIVOS ESTÁTICOS (CSS, JS, IMAGES) ---
+STATIC_URL = '/static/'
+
+# Onde o Django coleta os arquivos no deploy (Render)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Onde estão os arquivos estáticos do seu projeto (Desenvolvimento)
+STATICFILES_DIRS = [
+    # Ajuste este caminho se sua pasta frontend estiver em outro lugar
+    # Aqui assume: raiz/codigo-fonte/frontend/assets
+    os.path.join(BASE_DIR.parent, 'frontend', 'assets'),
+]
+
+# Configuração do Whitenoise para servir arquivos
+# OBS: Usei 'CompressedStaticFilesStorage' que é mais seguro que 'Manifest' para evitar erros 500
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+
+# --- ARQUIVOS DE MÍDIA (Uploads de Produtos) ---
+MEDIA_URL = '/media/'
+# Salva na pasta media fora do backend
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- CONFIGURAÇÃO JAZZMIN (Painel Admin) ---
 JAZZMIN_SETTINGS = {
     "site_title": "SOCINA Admin",
     "site_header": "SOCINA",
@@ -67,69 +170,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Correto
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-ROOT_URLCONF = 'loja.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'loja/templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'loja.wsgi.application'
-
-# Banco de dados (lido do ambiente)
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
-
-AUTH_PASSWORD_VALIDATORS = []
-
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_TZ = True
-
-# --- ARQUIVOS ESTÁTICOS ---
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    # O caminho correto para o Django encontrar a pasta 'assets' dentro de 'frontend'
-    os.path.join(BASE_DIR.parent, 'frontend/assets'),
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# --- ARQUIVOS DE MÍDIA (Imagens dos Produtos) ---
-# Media Root deve apontar para a pasta 'media' que está FORA de 'backend' (no mesmo nível de 'frontend')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Chave do Mercado Pago (lida do ambiente)
-MERCADO_PAGO_ACCESS_TOKEN = os.environ.get('MERCADO_PAGO_ACCESS_TOKEN', 'FAKE_TOKEN_PARA_RODAR_LOCAL')
