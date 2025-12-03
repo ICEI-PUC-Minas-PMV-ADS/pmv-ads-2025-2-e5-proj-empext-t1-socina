@@ -1,6 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+# --- NOVA TABELA DE CATEGORIAS ---
+class Categoria(models.Model):
+    nome = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.nome
+    
+    class Meta:
+        verbose_name = "Categoria"
+        verbose_name_plural = "Categorias"
+
 class Cliente(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     endereco = models.CharField(max_length=200)
@@ -9,32 +20,24 @@ class Cliente(models.Model):
         return self.usuario.username
 
 class Produto(models.Model):
-    # Definindo as opções da lista suspensa
-    CATEGORIA_CHOICES = [
-        ('camisa', 'Camisa'),
-        ('camiseta', 'Camiseta'),
-        ('calca', 'Calça'),
-        ('short', 'Short'),
-        ('vestido', 'Vestido'),
-        ('acessorio', 'Acessório'),
-        ('outros', 'Outros'),
-    ]
-
     nome = models.CharField(max_length=100)
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     descricao = models.TextField()
     quantidade_estoque = models.IntegerField()
     
-    # Aqui aplicamos a lista suspensa
-    categoria = models.CharField(max_length=50, choices=CATEGORIA_CHOICES, default='outros')
+    # MUDANÇA AQUI: Agora liga com a tabela Categoria
+    categoria = models.ForeignKey(
+        Categoria, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True
+    )
     
-    # Imagem do produto (Media)
     imagem = models.ImageField(upload_to='produtos/', null=True, blank=True)
 
     def __str__(self):
         return self.nome
 
-# ... (Mantenha as classes Pedido e ItemPedido como estavam) ...
 class Pedido(models.Model):
     STATUS_CHOICES = [
         ('pendente', 'Pendente'),
