@@ -4,16 +4,14 @@
 {% block content %}
    <style>
        .banner-bg {
-           /* O editor não reclama se estiver isolado aqui */
            background-image: url("{% static 'images/banner-bg.png' %}");
            background-color: #333;
        }
    </style>
 
-   <section class="banner-bg relative bg-cover bg-center h-[500px] flex items-center justify-center">
-            
+   <!-- Banner -->
+   <section class="banner-bg relative bg-cover bg-center h-[500px] flex items-center justify-center rounded-lg overflow-hidden shadow-xl mb-12">
         <div class="absolute inset-0 bg-black opacity-40"></div>
-        
         <div class="relative z-10 text-center text-white bg-black bg-opacity-30 p-8 rounded-lg max-w-2xl">
             <h2 class="text-5xl font-bold mb-4">Sejam bem-vindos à SOCINA!</h2>
             <p class="text-xl mb-8">Venham desfrutar da arte que é se vestir.</p>
@@ -23,47 +21,32 @@
         </div>
    </section>
 
-   <section class="bg-gray-50 py-16">
+   <!-- Benefícios (Ícones) -->
+   <section class="bg-white py-12 rounded-lg shadow-sm">
         <div class="container mx-auto text-center px-4">
-            <h2 class="text-4xl font-bold text-socina-pink-dark mb-12">Comprando com a gente você tem:</h2>
+            <h2 class="text-3xl font-bold text-socina-pink-dark mb-12">Diferenciais SOCINA</h2>
             
             <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-                
                 <div class="flex flex-col items-center group">
-                    <div class="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <img src="{% static 'images/cupom-de-desconto.png' %}" class="w-12 h-12 object-contain" alt="Desconto">
-                    </div>
+                    <img src="{% static 'images/cupom-de-desconto.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Desconto">
                     <p class="font-semibold text-gray-700">10% off na 1ª compra</p>
                 </div>
-
                 <div class="flex flex-col items-center group">
-                    <div class="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <img src="{% static 'images/delivery.png' %}" class="w-12 h-12 object-contain" alt="Frete Fixo">
-                    </div>
+                    <img src="{% static 'images/delivery.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Frete">
                     <p class="font-semibold text-gray-700">Frete fixo para BH</p>
                 </div>
-
                 <div class="flex flex-col items-center group">
-                    <div class="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <img src="{% static 'images/credit-card.png' %}" class="w-12 h-12 object-contain" alt="Parcelamento">
-                    </div>
-                    <p class="font-semibold text-gray-700">Parcelamento facilitado</p>
+                    <img src="{% static 'images/credit-card.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Cartão">
+                    <p class="font-semibold text-gray-700">Parcelamento fácil</p>
                 </div>
-
                 <div class="flex flex-col items-center group">
-                    <div class="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <img src="{% static 'images/delivery-man.png' %}" class="w-12 h-12 object-contain" alt="Retirada">
-                    </div>
+                    <img src="{% static 'images/delivery-man.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Retirada">
                     <p class="font-semibold text-gray-700">Opção de Retirada</p>
                 </div>
-
                 <div class="flex flex-col items-center col-span-2 md:col-span-1 group">
-                    <div class="w-24 h-24 mb-4 flex items-center justify-center bg-white rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <img src="{% static 'images/checklist.png' %}" class="w-12 h-12 object-contain" alt="Frete Grátis">
-                    </div>
+                    <img src="{% static 'images/checklist.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Grátis">
                     <p class="font-semibold text-gray-700">Frete grátis (+ R$600)</p>
                 </div>
-
             </div>
         </div>
    </section>

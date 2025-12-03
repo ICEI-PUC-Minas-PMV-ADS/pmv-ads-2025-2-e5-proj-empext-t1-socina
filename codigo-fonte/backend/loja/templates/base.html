@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link rel="stylesheet" href="{% static 'assets/css/styles.css' %}">
+    <!-- CSS da Loja -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,12 +16,8 @@
     <title>{% block title %}SOCINA{% endblock %}</title>
     
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-        }
-        main {
-            margin-top: 100px; 
-        }
+        body { font-family: 'Montserrat', sans-serif; }
+        main { margin-top: 100px; }
     </style>
     
     <script>
@@ -28,8 +25,6 @@
             theme: {
                 extend: {
                     colors: {
-                        /* AQUI ESTAVA O ERRO: Substituí as variáveis por cores REAIS (HEX) */
-                        /* Rosa Claro e Rosa Escuro fixos */
                         'socina-pink-light': '#ec4899', 
                         'socina-pink-dark': '#be185d',
                     }
@@ -39,11 +34,12 @@
     </script>
 </head>
 <body class="bg-gray-50">
+   <!-- CABEÇALHO ROSA (SÓ PARA A LOJA) -->
    <header class="bg-socina-pink-light shadow-md fixed top-0 left-0 right-0 z-10"> 
         <div class="container mx-auto flex justify-between items-center p-4">
             <h1>
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'assets/images/img.png' %}" alt="SOCINA" class="h-16 w-auto block">
+                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-16 w-auto block">
                 </a>
             </h1>
             <nav>
@@ -54,8 +50,15 @@
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
                             <li> 
-                                <a href="{% url 'admin:index' %}" class="bg-white text-socina-pink-light px-3 py-1 rounded hover:bg-gray-100 transition-colors">
-                                    Painel
+                                <!-- Link para o Dashboard Personalizado -->
+                                <a href="{% url 'admin_dashboard' %}" class="bg-white text-socina-pink-light px-3 py-1 rounded hover:bg-gray-100 transition-colors">
+                                    Painel Gerencial
+                                </a>
+                            </li>
+                            <li>
+                                <!-- Link para o Admin Django (Jazzmin) -->
+                                <a href="{% url 'admin:index' %}" class="hover:text-socina-pink-dark border border-white px-3 py-1 rounded">
+                                    Admin (BD)
                                 </a>
                             </li>
                         {% endif %}
