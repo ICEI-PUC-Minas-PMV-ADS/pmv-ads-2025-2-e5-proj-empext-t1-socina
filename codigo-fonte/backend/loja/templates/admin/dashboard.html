@@ -1,60 +1,107 @@
-{% extends 'base.html' %}
-{% block title %}Dashboard Admin{% endblock %}
+{% extends "admin/base_site.html" %}
+{% load static %}
 
 {% block content %}
-<div class="py-12">
-    <div class="flex justify-between items-center mb-8">
-        <h2 class="text-4xl font-bold text-socina-pink-dark">Dashboard de Vendas</h2>
-        <a href="{% url 'exportar_relatorio_csv' %}" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
-            Exportar Relatório (CSV)
-        </a>
+<div class="col-12">
+    
+    <h1 class="mb-4" style="font-weight: bold; color: #333;">Dashboard de Vendas</h1>
+    <!-- Botão de Exportar Relatório -->
+<div class="mb-4">
+    <a href="{% url 'exportar_relatorio_csv' %}" class="btn btn-success">
+        <i class="fas fa-file-csv"></i> Baixar Relatório de Vendas (CSV)
+    </a>
+</div>
+
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-12">
+            <div class="info-box bg-info">
+                <span class="info-box-icon"><i class="fas fa-shopping-cart"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Pedidos Recebidos</span>
+                    <span class="info-box-number" style="font-size: 24px;">{{ total_pedidos }}</span>
+                    <span class="progress-description">Todos os status</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="info-box bg-success">
+                <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Vendas Concluídas</span>
+                    <span class="info-box-number" style="font-size: 24px;">{{ total_vendas_qtd }}</span>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-12">
+            <div class="info-box bg-danger"> <span class="info-box-icon"><i class="fas fa-dollar-sign"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Faturamento Total</span>
+                    <span class="info-box-number" style="font-size: 24px;">R$ {{ total_vendas_valor|floatformat:2 }}</span>
+                    <span class="progress-description">Pedidos concluídos</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-600">Vendas Totais</h3>
-            <p class="text-3xl font-bold text-gray-900">R$ {{ total_vendas_geral|floatformat:2 }}</p>
+    <div class="card">
+        <div class="card-header bg-dark text-white">
+            <h3 class="card-title">Evolução de Vendas (Mensal)</h3>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-600">Total de Pedidos</h3>
-            <p class="text-3xl font-bold text-gray-900">{{ total_pedidos }}</p>
+        <div class="card-body">
+            <canvas id="salesChart" style="min-height: 300px; height: 300px; max-height: 300px; max-width: 100%;"></canvas>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">Vendas por Mês</h3>
-        <canvas id="vendasChart"></canvas>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    const ctx = document.getElementById('vendasChart');
-    new Chart(ctx, {
-        type: 'bar', // Tipo de gráfico (barra)
-        data: {
-            labels: JSON.parse('{{ labels|safe }}'), // Meses (ex: "Novembro/2025")
-            datasets: [{
-                label: 'Total Vendido (R$)',
-                data: JSON.parse('{{ data|safe }}'), // Valores (ex: [150.50, ...])
-                backgroundColor: 'rgba(254, 204, 205, 0.6)', // Cor socina-pink-light
-                borderColor: 'rgba(255, 0, 110, 1)', // Cor socina-pink-dark
-                borderWidth: 2
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        // Formata o eixo Y para mostrar "R$ 100,00"
-                        callback: function(value) {
-                            return 'R$ ' + value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('salesChart').getContext('2d');
+        
+        // Dados vindos do Django (Views.py)
+        var labels = JSON.parse('{{ chart_labels|safe }}');
+        var dataValues = JSON.parse('{{ chart_data|safe }}');
+
+        var salesChart = new Chart(ctx, {
+            type: 'bar', // Tipo do gráfico: 'bar' (barras) ou 'line' (linha)
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: dataValues,
+                    backgroundColor: 'rgba(236, 72, 153, 0.7)', // Cor Rosa SOCINA
+                    borderColor: 'rgba(190, 24, 93, 1)',      // Borda Rosa Escuro
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + value;
+                            }
                         }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
                     }
                 }
             }
-        }
+        });
     });
 </script>
 {% endblock %}

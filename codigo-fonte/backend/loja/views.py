@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from decimal import Decimal
 import urllib.parse 
+import csv
+from django.http import HttpResponse
 
 # Imports dos seus Modelos e Formulários
 from .models import Produto, Pedido, ItemPedido, Cliente
@@ -238,3 +240,38 @@ def deleta_produto(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     produto.delete()
     return redirect('lista_produtos')
+
+@staff_member_required
+def exportar_relatorio_csv(request):
+    """
+    Gera um arquivo CSV com todos os pedidos para a dona baixar.
+    """
+    # Cria a resposta do tipo CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="relatorio_vendas_socina.csv"'
+
+    writer = csv.writer(response)
+    # Cabeçalho das colunas
+    writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Frete', 'Total', 'Produtos'])
+
+    # Busca os pedidos
+    pedidos = Pedido.objects.all().order_by('-data')
+
+    for pedido in pedidos:
+        # Cria uma lista de produtos num texto só (ex: "Camisa (2), Calça (1)")
+        itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in pedido.itens.all()])
+        
+        # Formata a data
+        data_formatada = pedido.data.strftime('%d/%m/%Y %H:%M')
+
+        writer.writerow([
+            pedido.id,
+            pedido.cliente.usuario.username,
+            data_formatada,
+            pedido.get_status_display(),
+            pedido.valor_frete,
+            pedido.total,
+            itens_str
+        ])
+
+    return response
