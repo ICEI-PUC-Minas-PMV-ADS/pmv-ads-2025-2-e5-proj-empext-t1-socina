@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# exit on error
+# sai do script se der erro
 set -o errexit
 
-# 1. Instalar as dependências
-# (Ajuste o caminho se o requirements.txt estiver dentro de backend)
-pip install -r codigo-fonte/backend/requirements.txt
+# Instala as dependências
+pip install -r requirements.txt
 
-# 2. Entrar na pasta onde está o manage.py
-cd codigo-fonte/backend
+# Coleta os arquivos estáticos (CSS/Imagens)
+python manage.py collectstatic --no-input
 
-# 3. Coletar os arquivos estáticos (CSS/Imagens)
-python manage.py collectstatic --noinput
-
-# 4. Criar/Atualizar as tabelas do banco
+# Aplica as migrações no banco de dados
 python manage.py migrate
+
+# --- A MÁGICA ACONTECE AQUI ---
+# Roda o script que cria o usuário admin automaticamente
+python criar_superusuario.py
