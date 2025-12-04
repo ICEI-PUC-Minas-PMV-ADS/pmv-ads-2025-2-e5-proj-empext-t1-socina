@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- CSS da Loja -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +16,8 @@
     
     <style>
         body { font-family: 'Montserrat', sans-serif; }
-        main { margin-top: 100px; }
+        /* Garante que o conteúdo não fique escondido atrás do menu fixo */
+        main { padding-top: 80px; } 
     </style>
     
     <script>
@@ -33,13 +33,12 @@
         }
     </script>
 </head>
-<body class="bg-gray-50">
-   <!-- CABEÇALHO ROSA (SÓ PARA A LOJA) -->
-   <header class="bg-socina-pink-light shadow-md fixed top-0 left-0 right-0 z-10"> 
+<body class="bg-gray-50 flex flex-col min-h-screen">
+   <header class="bg-socina-pink-light shadow-md fixed top-0 left-0 right-0 z-50"> 
         <div class="container mx-auto flex justify-between items-center p-4">
             <h1>
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-16 w-auto block">
+                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-12 w-auto block">
                 </a>
             </h1>
             <nav>
@@ -50,22 +49,18 @@
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
                             <li> 
-                                <!-- Link para o Dashboard Personalizado -->
-                                <a href="{% url 'admin_dashboard' %}" class="bg-white text-socina-pink-light px-3 py-1 rounded hover:bg-gray-100 transition-colors">
-                                    Painel Gerencial
+                                <a href="{% url 'admin_dashboard' %}" class="bg-white text-socina-pink-light px-3 py-1 rounded hover:bg-gray-100 transition-colors text-sm">
+                                    Painel
                                 </a>
                             </li>
                             <li>
-                                <!-- Link para o Admin Django (Jazzmin) -->
-                                <a href="{% url 'admin:index' %}" class="hover:text-socina-pink-dark border border-white px-3 py-1 rounded">
-                                    Admin (BD)
+                                <a href="/admin/" class="border border-white px-3 py-1 rounded hover:bg-socina-pink-dark text-sm">
+                                    Admin
                                 </a>
                             </li>
                         {% endif %}
-
                         <li class="font-normal text-sm">Olá, {{ user.username }}</li>
-                        <li><a href="{% url 'logout' %}" class="hover:text-socina-pink-dark transition-colors">Sair</a></li>
-                    
+                        <li><a href="{% url 'logout' %}" class="hover:text-socina-pink-dark transition-colors text-sm">Sair</a></li>
                     {% else %}
                         <li><a href="{% url 'login' %}" class="hover:text-socina-pink-dark transition-colors">Entrar</a></li>
                     {% endif %}
@@ -74,8 +69,9 @@
         </div>
    </header>
 
-   <main class="container mx-auto p-4">
+   <main>
         {% block content %}{% endblock %}
    </main>
+
 </body>
 </html>
