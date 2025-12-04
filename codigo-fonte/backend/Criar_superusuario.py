@@ -1,25 +1,38 @@
 import os
 import django
 
-# Configura o ambiente do Django
-# TROQUE 'setup.settings' PELO NOME DA PASTA DO SEU PROJETO ONDE FICA O SETTINGS
-# Exemplo: se sua pasta principal chama 'loja', coloque 'loja.settings'
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "setup.settings") 
-django.setup()
+# --- CONFIGURAÇÃO EXATA BASEADA NO SEU CAMINHO ---
+# Como o settings.py está dentro da pasta 'loja', o caminho é este:
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "loja.settings")
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"ERRO CRÍTICO AO CONFIGURAR DJANGO: {e}")
+    exit(1)
 
 from django.contrib.auth.models import User
 
-def criar_usuario():
-    # Defina aqui o usuário e senha que você quer
-    USERNAME = 'socina'
-    EMAIL = 'socina@socina.com'
-    PASSWORD = 'socina@2025' # Troque por uma senha forte depois
+def criar_superusuario_automatico():
+    USERNAME = 'admin'
+    EMAIL = 'admin@socina.com'
+    PASSWORD = 'admin' 
 
-    if User.objects.filter(username=USERNAME).exists():
-        print(f"O usuário '{USERNAME}' já existe. Nenhuma ação necessária.")
-    else:
-        User.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
-        print(f"Superusuário '{USERNAME}' criado com sucesso!")
+    print("--> Iniciando verificação de superusuário...")
+
+    try:
+        if User.objects.filter(username=USERNAME).exists():
+            user = User.objects.get(username=USERNAME)
+            user.set_password(PASSWORD)
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
+            print(f"--> SUCESSO! Usuário '{USERNAME}' já existia. Senha resetada para '{PASSWORD}'.")
+        else:
+            User.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
+            print(f"--> SUCESSO! Usuário '{USERNAME}' criado do zero. Senha: {PASSWORD}")
+    except Exception as e:
+        print(f"--> ERRO NO BANCO DE DADOS: {e}")
 
 if __name__ == "__main__":
-    criar_usuario()
+    criar_superusuario_automatico()
