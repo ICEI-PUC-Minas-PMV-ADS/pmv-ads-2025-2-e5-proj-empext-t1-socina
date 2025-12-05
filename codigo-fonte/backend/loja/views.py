@@ -19,10 +19,10 @@ from .forms import ProdutoForm
 
 def home(request):
     """
-    CORREÇÃO: Redireciona direto para o Catálogo.
-    Isso evita que apareça a página 'index.html' antiga ou errada.
+    Página Inicial do site (Index).
+    Carrega o template 'index.html' (a página com banner preto e diferenciais).
     """
-    return redirect('catalogo')
+    return render(request, 'index.html')
 
 def catalogo(request):
     # Mostra todos os produtos com estoque maior que zero
