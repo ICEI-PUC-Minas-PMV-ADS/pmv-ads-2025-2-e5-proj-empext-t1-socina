@@ -34,33 +34,40 @@
     </script>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
+   
    <header class="bg-socina-pink-light shadow-md fixed top-0 left-0 right-0 z-50"> 
         <div class="container mx-auto flex justify-between items-center p-4">
+            
             <h1>
                 <a href="{% url 'home' %}">
                     <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-12 w-auto block">
                 </a>
             </h1>
+
             <nav>
                 <ul class="flex space-x-6 text-white font-bold text-lg items-center">
+                    
                     <li><a href="{% url 'catalogo' %}" class="hover:text-socina-pink-dark transition-colors">Catálogo</a></li>
                     <li><a href="{% url 'ver_carrinho' %}" class="hover:text-socina-pink-dark transition-colors">Carrinho</a></li>
                     
                     {% if user.is_authenticated %}
+                        
                         {% if user.is_staff %}
                             <li> 
-                                <a href="{% url 'admin_dashboard' %}" class="bg-white text-socina-pink-light px-3 py-1 rounded hover:bg-gray-100 transition-colors text-sm">
-                                    Painel
+                                <a href="/admin/" class="bg-white text-socina-pink-light px-4 py-1 rounded hover:bg-gray-100 transition-colors font-bold text-sm shadow-sm flex items-center gap-1">
+                                    ⚙️ Admin
                                 </a>
                             </li>
                             <li>
-                                <a href="/admin/" class="border border-white px-3 py-1 rounded hover:bg-socina-pink-dark text-sm">
-                                    Admin
+                                <a href="{% url 'admin_dashboard' %}" class="border border-white px-3 py-1 rounded hover:bg-socina-pink-dark text-sm flex items-center gap-1">
+                                    📊 Indicadores
                                 </a>
                             </li>
                         {% endif %}
-                        <li class="font-normal text-sm">Olá, {{ user.username }}</li>
+
+                        <li class="font-normal text-sm ml-2">Olá, {{ user.username }}</li>
                         <li><a href="{% url 'logout' %}" class="hover:text-socina-pink-dark transition-colors text-sm">Sair</a></li>
+                    
                     {% else %}
                         <li><a href="{% url 'login' %}" class="hover:text-socina-pink-dark transition-colors">Entrar</a></li>
                     {% endif %}

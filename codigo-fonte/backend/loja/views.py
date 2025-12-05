@@ -13,19 +13,16 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .models import Produto, Pedido, ItemPedido, Cliente
-from .forms import ProdutoForm
 
 # --- PÁGINAS PÚBLICAS ---
 
 def home(request):
     """
-    Página Inicial do site (Index).
-    Carrega o template 'index.html' (a página com banner preto e diferenciais).
+    Página Inicial pública (com banner preto).
     """
     return render(request, 'index.html')
 
 def catalogo(request):
-    # Mostra todos os produtos com estoque maior que zero
     produtos = Produto.objects.filter(quantidade_estoque__gt=0)
     return render(request, 'catalogo.html', {'produtos': produtos})
 
@@ -42,7 +39,6 @@ def cadastro_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Cria o perfil do cliente automaticamente
             Cliente.objects.create(usuario=user, endereco="Não informado")
             login(request, user)
             return redirect('catalogo')
@@ -58,8 +54,6 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            
-            # Se veio de uma tentativa de compra, volta para lá
             if 'next' in request.GET:
                 return redirect(request.GET.get('next'))
             return redirect('catalogo')
@@ -77,8 +71,6 @@ def ver_carrinho(request):
     carrinho = request.session.get('carrinho', {})
     itens_carrinho = []
     subtotal_pedido = Decimal('0.0')
-    
-    # Faz uma cópia para iterar com segurança caso precise deletar itens inválidos
     carrinho_atualizado = carrinho.copy()
     
     for produto_id, quantidade in carrinho.items():
@@ -92,14 +84,11 @@ def ver_carrinho(request):
                 'subtotal': subtotal
             })
         except Produto.DoesNotExist:
-            # Se o produto foi deletado do banco, remove do carrinho
             del carrinho_atualizado[produto_id]
     
-    # Atualiza a sessão se houve limpeza
     if len(carrinho) != len(carrinho_atualizado):
         request.session['carrinho'] = carrinho_atualizado
 
-    # Regra de Frete (Grátis acima de R$ 600)
     if not itens_carrinho:
         valor_frete = Decimal('0.0')
     elif subtotal_pedido >= 600:
@@ -142,10 +131,9 @@ def remover_do_carrinho(request, pk):
         request.session['carrinho'] = carrinho
     return redirect('ver_carrinho')
 
-# --- CHECKOUT E FINALIZAÇÃO ---
+# --- CHECKOUT ---
 
 def finalizar_pedido_whatsapp(request):
-    # Só permite finalizar se estiver logado
     if not request.user.is_authenticated:
         return redirect('/login/?next=/pedido/finalizar/')
 
@@ -157,7 +145,6 @@ def finalizar_pedido_whatsapp(request):
 
     try:
         with transaction.atomic():
-            # Garante/Recupera cliente
             cliente, created = Cliente.objects.get_or_create(
                 usuario=request.user, 
                 defaults={'endereco': 'Endereço não informado'}
@@ -166,7 +153,6 @@ def finalizar_pedido_whatsapp(request):
             subtotal_pedido = Decimal('0.0')
             itens_obj = []
             
-            # Prepara os itens
             for produto_id, quantidade in carrinho.items():
                 produto = Produto.objects.get(id=int(produto_id))
                 subtotal = produto.preco * quantidade
@@ -175,7 +161,6 @@ def finalizar_pedido_whatsapp(request):
             
             total_geral = subtotal_pedido + valor_frete
 
-            # Cria o Pedido no banco
             pedido = Pedido.objects.create(
                 cliente=cliente,
                 total=total_geral,
@@ -183,7 +168,6 @@ def finalizar_pedido_whatsapp(request):
                 status='em andamento' 
             )
 
-            # Cria os Itens do Pedido e baixa estoque
             for item in itens_obj:
                 ItemPedido.objects.create(
                     pedido=pedido,
@@ -195,12 +179,10 @@ def finalizar_pedido_whatsapp(request):
                 prod.quantidade_estoque -= item['qtd']
                 prod.save()
 
-            # Limpa carrinho
             del request.session['carrinho']
             if 'valor_frete' in request.session:
                 del request.session['valor_frete']
 
-            # Monta a mensagem do WhatsApp
             texto = f"Olá! Acabei de fazer o pedido *#{pedido.id}* pelo site SOCINA. 💕\n\n"
             texto += "*Resumo do Pedido:*\n"
             for item in itens_obj:
@@ -220,22 +202,19 @@ def finalizar_pedido_whatsapp(request):
         messages.error(request, f"Erro ao processar: {e}")
         return redirect('ver_carrinho')
 
-# --- ÁREA ADM (DASHBOARD COMPLETO) ---
+# --- DASHBOARD DE INDICADORES (Apenas Visualização) ---
 
 @staff_member_required
 def admin_dashboard_view(request):
     """
-    Exibe indicadores de vendas e dados para o gráfico.
+    Exibe os gráficos e indicadores.
+    Não faz cadastro de produtos (isso fica no Admin).
     """
-    # 1. Total de Pedidos Geral
     total_pedidos = Pedido.objects.count()
-
-    # 2. Vendas Concluídas (Faturamento e Quantidade)
     pedidos_concluidos = Pedido.objects.filter(status='concluido')
     total_vendas_valor = pedidos_concluidos.aggregate(Sum('total'))['total__sum'] or 0
     total_vendas_qtd = pedidos_concluidos.count()
 
-    # 3. Dados para o Gráfico (Agrupado por mês)
     vendas_mensais = (
         Pedido.objects
         .filter(status='concluido')
@@ -266,57 +245,14 @@ def admin_dashboard_view(request):
 
 @staff_member_required
 def exportar_relatorio_csv(request):
-    """
-    Gera um arquivo CSV com todos os pedidos para download.
-    """
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="relatorio_vendas.csv"'
-
     writer = csv.writer(response)
-    # Cabeçalho do CSV
     writer.writerow(['ID Pedido', 'Cliente', 'Data', 'Status', 'Frete', 'Total', 'Produtos'])
-
     pedidos = Pedido.objects.all().order_by('-data')
-
     for pedido in pedidos:
-        # Pega a lista de produtos em texto
         itens = pedido.itens.all()
-        if itens:
-            itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in itens])
-        else:
-            itens_str = "Sem itens"
-            
-        data_formatada = pedido.data.strftime('%d/%m/%Y %H:%M')
-        
-        # Pega o nome do usuário com segurança
+        itens_str = ", ".join([f"{item.produto.nome} ({item.quantidade})" for item in itens]) if itens else "Sem itens"
         cliente_nome = pedido.cliente.usuario.username if pedido.cliente and pedido.cliente.usuario else "Desconhecido"
-
-        writer.writerow([
-            pedido.id,
-            cliente_nome,
-            data_formatada,
-            pedido.get_status_display(),
-            pedido.valor_frete,
-            pedido.total,
-            itens_str
-        ])
-
+        writer.writerow([pedido.id, cliente_nome, pedido.data.strftime('%d/%m/%Y %H:%M'), pedido.get_status_display(), pedido.valor_frete, pedido.total, itens_str])
     return response
-
-# --- CRUD PERSONALIZADO (Ações Rápidas do Dashboard) ---
-
-@staff_member_required
-def lista_produtos(request):
-    produtos = Produto.objects.all()
-    return render(request, 'admin/lista_produtos.html', {'produtos': produtos})
-
-@staff_member_required
-def cadastra_produto(request):
-    if request.method == 'POST':
-        form = ProdutoForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('lista_produtos')
-    else:
-        form = ProdutoForm()
-    return render(request, 'admin/cadastra_produto.html', {'form': form})
