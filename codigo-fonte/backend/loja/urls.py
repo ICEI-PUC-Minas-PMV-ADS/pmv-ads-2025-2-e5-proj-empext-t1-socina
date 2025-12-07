@@ -5,18 +5,24 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # --- ROTA HOME PÚBLICA ---
+    # --- HOME ---
     path('', views.home, name='home'),
 
-    # --- ADMIN (Gestão completa) ---
+    # --- ADMIN ---
     path('admin/', admin.site.urls),
 
     # --- LOJA ---
     path('catalogo/', views.catalogo, name='catalogo'),
     path('produto/<int:pk>/', views.produto_detalhe_view, name='produto_detalhe'),
+    
+    # --- CARRINHO E CHECKOUT ---
     path('carrinho/', views.ver_carrinho, name='ver_carrinho'),
     path('carrinho/adicionar/<int:pk>/', views.adicionar_ao_carrinho, name='adicionar_ao_carrinho'),
     path('carrinho/remover/<int:pk>/', views.remover_do_carrinho, name='remover_do_carrinho'),
+    
+    # NOVA ROTA DE ENDEREÇO
+    path('checkout/', views.checkout_view, name='checkout'),
+    
     path('pedido/finalizar/', views.finalizar_pedido_whatsapp, name='finalizar_pedido'),
 
     # --- LOGIN ---
@@ -24,7 +30,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
-    # --- RELATÓRIOS (Indicadores) ---
+    # --- DASHBOARD ---
     path('painel/dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
     path('painel/relatorio/exportar/', views.exportar_relatorio_csv, name='exportar_relatorio_csv'),
 ]
