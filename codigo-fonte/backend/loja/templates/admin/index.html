@@ -1,0 +1,14 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+    <div style="background-color: #fff; padding: 20px; border-left: 5px solid #ff006e; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2 style="margin-top: 0; color: #333; font-size: 20px;">Painel de Indicadores</h2>
+        <p style="color: #666;">Visualize o faturamento e gráficos de vendas.</p>
+        
+        <a href="{% url 'admin_dashboard' %}" style="background-color: #ff006e; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px;">
+            📊 Acessar Gráficos
+        </a>
+    </div>
+
+    {{ block.super }}
+{% endblock %}

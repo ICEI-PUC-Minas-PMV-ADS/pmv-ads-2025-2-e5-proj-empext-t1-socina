@@ -5,81 +5,83 @@
 
 {% block content %}
    
-   <section class="bg-socina-primary min-h-[600px] flex items-center relative overflow-hidden">
+   <section class="bg-socina-primary min-h-[650px] flex items-center relative overflow-hidden">
         
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full py-12">
             
             <div class="text-left z-10 md:pl-12">
                 
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-2 tracking-wide uppercase">
+                <h2 class="text-5xl md:text-6xl font-black text-gray-900 leading-none mb-4 tracking-wide uppercase drop-shadow-sm">
                     Bem-vinda ao seu <br>
-                    <span class="text-socina-pink">Novo Mood.</span>
+                    <span class="text-socina-pink drop-shadow-md">Novo Mood.</span>
                 </h2>
                 
-                <p class="text-gray-700 text-sm uppercase tracking-widest mb-8 font-medium">
+                <p class="text-gray-900 text-base font-bold uppercase tracking-widest mb-10">
                     Básicos versáteis, atemporais e confortáveis.
                 </p>
 
-                <div class="border border-gray-800 p-4 inline-block mb-8 bg-white/10 backdrop-blur-sm max-w-xs text-center">
-                    <p class="text-2xl font-bold text-gray-900">10% OFF</p>
-                    <p class="text-xs text-gray-800 uppercase leading-relaxed mt-1">
-                        Na primeira compra <br> usando o cupom "BEMVINDA"
+                <div class="border-2 border-socina-pink bg-white/40 backdrop-blur-md p-6 inline-block mb-10 shadow-lg rotate-1 hover:rotate-0 transition-transform">
+                    <p class="text-3xl font-black text-socina-pink">10% OFF</p>
+                    <p class="text-sm text-gray-900 font-bold uppercase leading-relaxed mt-2">
+                        Na primeira compra <br> use cupom: <span class="bg-socina-pink text-white px-1">BEMVINDA</span>
                     </p>
                 </div>
 
                 <div class="block">
-                    <a href="{% url 'catalogo' %}" class="bg-socina-pink text-white font-bold py-3 px-10 hover:bg-pink-700 transition-colors uppercase tracking-widest text-sm shadow-lg">
+                    <a href="{% url 'catalogo' %}" class="bg-socina-pink text-white text-lg font-black py-4 px-12 hover:bg-socina-dark transition-all uppercase tracking-widest shadow-xl hover:shadow-2xl hover:scale-105 inline-block">
                         Ver Coleção
                     </a>
                 </div>
             </div>
 
-            <div class="relative h-[400px] md:h-[600px] w-full flex justify-center items-center">
+            <div class="relative h-[450px] md:h-[650px] w-full flex justify-center items-center">
                 
-                <div class="absolute right-10 top-10 md:right-20 md:top-20 w-48 md:w-64 h-64 md:h-96 bg-white p-2 shadow-xl transform rotate-2">
+                <div class="absolute right-5 top-10 md:right-20 md:top-20 w-56 md:w-72 h-72 md:h-[450px] bg-white p-3 shadow-2xl transform rotate-3 border-2 border-white">
                     <img src="{% static 'images/banner-bg.png' %}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
                 </div>
 
-                <div class="absolute left-10 bottom-10 md:left-20 md:bottom-20 w-40 md:w-56 h-56 md:h-80 bg-white p-2 shadow-2xl transform -rotate-3 z-20">
-                     <img src="{% static 'images/banner-bg.png' %}" class="w-full h-full object-cover">
+                <div class="absolute left-5 bottom-10 md:left-20 md:bottom-20 w-48 md:w-64 h-64 md:h-[400px] bg-white p-3 shadow-2xl transform -rotate-3 z-20 border-2 border-socina-pink">
+                    <img src="{% static 'images/banner-bg.png' %}" class="w-full h-full object-cover">
                 </div>
                 
             </div>
         </div>
    </section>
 
-   <section id="lancamentos" class="bg-white py-16">
+   <section id="lancamentos" class="bg-white py-20">
         <div class="container mx-auto px-4">
             
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12 uppercase tracking-widest">
+            <h2 class="text-4xl font-black text-center text-socina-pink mb-16 uppercase tracking-widest">
                 Lançamentos
             </h2>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                
                 <div class="group cursor-pointer">
-                    <div class="overflow-hidden mb-3 relative">
-                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105">
-                        <div class="absolute bottom-0 left-0 w-full bg-socina-pink text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            VER DETALHES
+                    <div class="overflow-hidden mb-4 relative shadow-lg rounded-lg border border-gray-100">
+                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110">
+                        
+                        <div class="absolute bottom-4 left-4 right-4 bg-socina-pink text-white text-center py-3 font-bold uppercase tracking-wider opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-md">
+                            Ver Detalhes
                         </div>
                     </div>
-                    <h3 class="text-sm font-bold text-gray-800 uppercase">Cardigan Tricot Pink</h3>
-                    <p class="text-gray-500 text-sm">R$ 149,90</p>
+                    <h3 class="text-base font-bold text-gray-900 uppercase">Cardigan Tricot</h3>
+                    <p class="text-socina-pink font-bold text-lg">R$ 149,90</p>
                 </div>
 
                 <div class="group cursor-pointer">
-                    <div class="overflow-hidden mb-3 relative">
-                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105">
-                         <div class="absolute bottom-0 left-0 w-full bg-socina-pink text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            VER DETALHES
+                    <div class="overflow-hidden mb-4 relative shadow-lg rounded-lg border border-gray-100">
+                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-700 group-hover:scale-110">
+                         <div class="absolute bottom-4 left-4 right-4 bg-socina-pink text-white text-center py-3 font-bold uppercase tracking-wider opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-md">
+                            Ver Detalhes
                         </div>
                     </div>
-                    <h3 class="text-sm font-bold text-gray-800 uppercase">Body Básico Cinza</h3>
-                    <p class="text-gray-500 text-sm">R$ 89,90</p>
+                    <h3 class="text-base font-bold text-gray-900 uppercase">Body Básico</h3>
+                    <p class="text-socina-pink font-bold text-lg">R$ 89,90</p>
                 </div>
 
-                 <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center mt-8">
-                    <a href="{% url 'catalogo' %}" class="inline-block border-b-2 border-socina-pink text-socina-pink font-bold pb-1 hover:text-pink-800 transition-colors uppercase tracking-widest">
+                 <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center mt-12">
+                    <a href="{% url 'catalogo' %}" class="inline-block border-2 border-socina-pink text-socina-pink font-black py-3 px-8 hover:bg-socina-pink hover:text-white transition-all uppercase tracking-widest rounded-full">
                         Ver todos os produtos
                     </a>
                  </div>
