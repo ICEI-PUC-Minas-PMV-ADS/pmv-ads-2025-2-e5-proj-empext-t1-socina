@@ -1,53 +1,91 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Bem-vindo à SOCINA{% endblock %}
+
 {% block content %}
-   <style>
-       .banner-bg {
-           background-image: url("{% static 'images/banner-bg.png' %}");
-           background-color: #333;
-       }
-   </style>
-
-   <!-- Banner -->
-   <section class="banner-bg relative bg-cover bg-center h-[500px] flex items-center justify-center rounded-lg overflow-hidden shadow-xl mb-12">
-        <div class="absolute inset-0 bg-black opacity-40"></div>
-        <div class="relative z-10 text-center text-white bg-black bg-opacity-30 p-8 rounded-lg max-w-2xl">
-            <h2 class="text-5xl font-bold mb-4">Sejam bem-vindos à SOCINA!</h2>
-            <p class="text-xl mb-8">Venham desfrutar da arte que é se vestir.</p>
-            <a href="{% url 'catalogo' %}" class="bg-socina-pink-light text-white font-bold py-3 px-8 rounded-lg hover:bg-socina-pink-dark transition-colors text-lg">
-                Ver Produtos
-            </a>
-        </div>
-   </section>
-
-   <!-- Benefícios (Ícones) -->
-   <section class="bg-white py-12 rounded-lg shadow-sm">
-        <div class="container mx-auto text-center px-4">
-            <h2 class="text-3xl font-bold text-socina-pink-dark mb-12">Diferenciais SOCINA</h2>
+   
+   <section class="bg-socina-primary min-h-[600px] flex items-center relative overflow-hidden">
+        
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full py-12">
             
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-                <div class="flex flex-col items-center group">
-                    <img src="{% static 'images/cupom-de-desconto.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Desconto">
-                    <p class="font-semibold text-gray-700">10% off na 1ª compra</p>
+            <div class="text-left z-10 md:pl-12">
+                
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-2 tracking-wide uppercase">
+                    Bem-vinda ao seu <br>
+                    <span class="text-socina-pink">Novo Mood.</span>
+                </h2>
+                
+                <p class="text-gray-700 text-sm uppercase tracking-widest mb-8 font-medium">
+                    Básicos versáteis, atemporais e confortáveis.
+                </p>
+
+                <div class="border border-gray-800 p-4 inline-block mb-8 bg-white/10 backdrop-blur-sm max-w-xs text-center">
+                    <p class="text-2xl font-bold text-gray-900">10% OFF</p>
+                    <p class="text-xs text-gray-800 uppercase leading-relaxed mt-1">
+                        Na primeira compra <br> usando o cupom "BEMVINDA"
+                    </p>
                 </div>
-                <div class="flex flex-col items-center group">
-                    <img src="{% static 'images/delivery.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Frete">
-                    <p class="font-semibold text-gray-700">Frete fixo para BH</p>
+
+                <div class="block">
+                    <a href="{% url 'catalogo' %}" class="bg-socina-pink text-white font-bold py-3 px-10 hover:bg-pink-700 transition-colors uppercase tracking-widest text-sm shadow-lg">
+                        Ver Coleção
+                    </a>
                 </div>
-                <div class="flex flex-col items-center group">
-                    <img src="{% static 'images/credit-card.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Cartão">
-                    <p class="font-semibold text-gray-700">Parcelamento fácil</p>
+            </div>
+
+            <div class="relative h-[400px] md:h-[600px] w-full flex justify-center items-center">
+                
+                <div class="absolute right-10 top-10 md:right-20 md:top-20 w-48 md:w-64 h-64 md:h-96 bg-white p-2 shadow-xl transform rotate-2">
+                    <img src="{% static 'images/banner-bg.png' %}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
                 </div>
-                <div class="flex flex-col items-center group">
-                    <img src="{% static 'images/delivery-man.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Retirada">
-                    <p class="font-semibold text-gray-700">Opção de Retirada</p>
+
+                <div class="absolute left-10 bottom-10 md:left-20 md:bottom-20 w-40 md:w-56 h-56 md:h-80 bg-white p-2 shadow-2xl transform -rotate-3 z-20">
+                     <img src="{% static 'images/banner-bg.png' %}" class="w-full h-full object-cover">
                 </div>
-                <div class="flex flex-col items-center col-span-2 md:col-span-1 group">
-                    <img src="{% static 'images/checklist.png' %}" class="w-16 h-16 object-contain mb-4 transition-transform group-hover:scale-110" alt="Grátis">
-                    <p class="font-semibold text-gray-700">Frete grátis (+ R$600)</p>
-                </div>
+                
             </div>
         </div>
    </section>
+
+   <section id="lancamentos" class="bg-white py-16">
+        <div class="container mx-auto px-4">
+            
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12 uppercase tracking-widest">
+                Lançamentos
+            </h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden mb-3 relative">
+                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105">
+                        <div class="absolute bottom-0 left-0 w-full bg-socina-pink text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            VER DETALHES
+                        </div>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-800 uppercase">Cardigan Tricot Pink</h3>
+                    <p class="text-gray-500 text-sm">R$ 149,90</p>
+                </div>
+
+                <div class="group cursor-pointer">
+                    <div class="overflow-hidden mb-3 relative">
+                        <img src="{% static 'images/banner-bg.png' %}" class="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105">
+                         <div class="absolute bottom-0 left-0 w-full bg-socina-pink text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            VER DETALHES
+                        </div>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-800 uppercase">Body Básico Cinza</h3>
+                    <p class="text-gray-500 text-sm">R$ 89,90</p>
+                </div>
+
+                 <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center mt-8">
+                    <a href="{% url 'catalogo' %}" class="inline-block border-b-2 border-socina-pink text-socina-pink font-bold pb-1 hover:text-pink-800 transition-colors uppercase tracking-widest">
+                        Ver todos os produtos
+                    </a>
+                 </div>
+
+            </div>
+        </div>
+   </section>
+
 {% endblock %}

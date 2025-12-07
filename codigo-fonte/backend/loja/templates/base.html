@@ -16,8 +16,8 @@
     
     <style>
         body { font-family: 'Montserrat', sans-serif; }
-        /* Garante que o conteúdo não fique escondido atrás do menu fixo */
-        main { padding-top: 80px; } 
+        /* Ajuste para o menu fixo não cobrir o topo */
+        main { padding-top: 100px; } 
     </style>
     
     <script>
@@ -25,60 +25,72 @@
             theme: {
                 extend: {
                     colors: {
-                        'socina-pink-light': '#ec4899', 
-                        'socina-pink-dark': '#be185d',
+                        // SUAS CORES PERSONALIZADAS
+                        'socina-primary': '#fecccd', /* Rosa Claro (Fundo) */
+                        'socina-pink': '#ff006e',    /* Rosa Choque (Botões/Detalhes) */
+                        'socina-white': '#FFFFFF',
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body class="bg-white flex flex-col min-h-screen">
    
-   <header class="bg-socina-pink-light shadow-md fixed top-0 left-0 right-0 z-50"> 
-        <div class="container mx-auto flex justify-between items-center p-4">
+   <div class="bg-socina-primary text-socina-pink text-center text-xs py-2 font-bold tracking-widest uppercase">
+        Ganhe 10% de desconto usando o cupom BEMVINDA
+   </div>
+
+   <header class="bg-white/90 backdrop-blur-md shadow-sm fixed top-8 left-0 right-0 z-50 h-20"> 
+        <div class="container mx-auto flex justify-between items-center h-full px-6">
             
-            <h1>
+            <nav class="hidden md:flex space-x-6 text-gray-600 font-medium text-sm uppercase tracking-wide">
+                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink transition-colors">Shop</a>
+                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink transition-colors">Lançamentos</a>
+            </nav>
+            <div class="md:hidden text-2xl cursor-pointer">
+                ☰ </div>
+
+            <h1 class="absolute left-1/2 transform -translate-x-1/2">
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-12 w-auto block">
+                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-10 md:h-14 w-auto block object-contain">
                 </a>
             </h1>
 
-            <nav>
-                <ul class="flex space-x-6 text-white font-bold text-lg items-center">
-                    
-                    <li><a href="{% url 'catalogo' %}" class="hover:text-socina-pink-dark transition-colors">Catálogo</a></li>
-                    <li><a href="{% url 'ver_carrinho' %}" class="hover:text-socina-pink-dark transition-colors">Carrinho</a></li>
-                    
-                    {% if user.is_authenticated %}
-                        
-                        {% if user.is_staff %}
-                            <li> 
-                                <a href="/admin/" class="bg-white text-socina-pink-light px-4 py-1 rounded hover:bg-gray-100 transition-colors font-bold text-sm shadow-sm flex items-center gap-1">
-                                    ⚙️ Admin
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'admin_dashboard' %}" class="border border-white px-3 py-1 rounded hover:bg-socina-pink-dark text-sm flex items-center gap-1">
-                                    📊 Indicadores
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        <li class="font-normal text-sm ml-2">Olá, {{ user.username }}</li>
-                        <li><a href="{% url 'logout' %}" class="hover:text-socina-pink-dark transition-colors text-sm">Sair</a></li>
-                    
-                    {% else %}
-                        <li><a href="{% url 'login' %}" class="hover:text-socina-pink-dark transition-colors">Entrar</a></li>
+            <div class="flex items-center space-x-4 text-gray-700">
+                
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                        <a href="/admin/" class="text-xs font-bold text-socina-pink border border-socina-pink px-2 py-1 rounded hover:bg-socina-pink hover:text-white transition">ADMIN</a>
                     {% endif %}
-                </ul>
-            </nav>
+                    <a href="{% url 'logout' %}" class="text-sm hover:text-socina-pink hidden md:block">Sair</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-2xl hover:text-socina-pink">👤</a>
+                {% endif %}
+
+                <a href="{% url 'ver_carrinho' %}" class="relative text-2xl hover:text-socina-pink transition-colors">
+                    🛍️
+                    </a>
+            </div>
         </div>
    </header>
 
-   <main>
+   <main class="flex-grow">
         {% block content %}{% endblock %}
    </main>
+
+   <footer class="bg-gray-100 py-8 mt-12 text-center text-gray-500 text-sm">
+        <p>&copy; 2025 SOCINA. Todos os direitos reservados.</p>
+   </footer>
+
+   <a href="https://wa.me/553192742082" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
+        </svg>
+   </a>
 
 </body>
 </html>
