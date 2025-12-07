@@ -1,40 +1,88 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}{{ produto.nome }} - SOCINA{% endblock %}
 
 {% block content %}
-<div class="py-12">
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden md:flex">
-        <div class="md:w-1/2">
+<div class="container mx-auto px-4 py-12">
+    
+    <nav class="text-sm mb-8 text-gray-600 font-medium uppercase tracking-wide">
+        <a href="{% url 'home' %}" class="hover:text-socina-pink">Home</a> > 
+        <a href="{% url 'catalogo' %}" class="hover:text-socina-pink">Catálogo</a> > 
+        <span class="text-gray-900 font-bold">{{ produto.nome }}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 bg-white p-6 md:p-12 rounded-3xl shadow-xl">
+        
+        <div class="relative group overflow-hidden rounded-2xl shadow-lg border-2 border-gray-100">
             {% if produto.imagem %}
-                <img class="h-full w-full object-cover" src="{{ produto.imagem.url }}" alt="{{ produto.nome }}">
+                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="w-full h-[500px] md:h-[700px] object-cover transition-transform duration-700 group-hover:scale-105">
             {% else %}
-                <div class="h-full w-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-500">Sem Imagem</span>
+                <div class="w-full h-[500px] bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-xl uppercase">
+                    Sem Imagem
                 </div>
             {% endif %}
-        </div>
-        
-        <div class="md:w-1/2 p-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2" style="font-family: 'Montserrat', sans-serif;">{{ produto.nome }}</h1>
-            <p class="text-2xl text-socina-pink-dark font-bold mb-4">R$ {{ produto.preco }}</p>
-            
-            <div class="mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Descrição</h3>
-                <p class="text-gray-600">{{ produto.descricao|linebreaks }}</p>
+            <div class="absolute top-4 left-4 bg-socina-pink text-white text-xs font-bold uppercase tracking-widest py-2 px-4 rounded-full shadow-md">
+                {{ produto.categoria.nome }}
             </div>
+        </div>
+
+        <div class="flex flex-col justify-center">
             
+            <h1 class="text-4xl md:text-5xl font-black text-gray-900 uppercase mb-4 leading-tight">
+                {{ produto.nome }}
+            </h1>
+            
+            <p class="text-3xl md:text-4xl font-black text-socina-pink mb-8">
+                R$ {{ produto.preco }}
+            </p>
+
+            <div class="prose max-w-none text-gray-700 mb-10 text-lg leading-relaxed">
+                <h3 class="text-xl font-bold text-gray-900 uppercase mb-4">Descrição</h3>
+                {{ produto.descricao|linebreaks }}
+            </div>
+
             {% if produto.quantidade_estoque > 0 %}
-                <p class="text-sm text-green-600 mb-4">Em estoque ({{ produto.quantidade_estoque }} unidades)</p>
-                <a href="{% url 'adicionar_ao_carrinho' produto.pk %}" class="w-full text-center bg-socina-pink-dark text-white font-bold py-3 px-6 rounded-lg hover:opacity-90 transition-opacity">
-                    Adicionar ao Carrinho
-                </a>
+                <div class="bg-green-50 text-green-800 px-4 py-2 rounded-lg font-bold uppercase text-sm inline-block mb-6 border border-green-200">
+                    ✓ Em Estoque ({{ produto.quantidade_estoque }} disponíveis)
+                </div>
+
+                <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="POST" class="flex flex-col sm:flex-row gap-4">
+                    {% csrf_token %}
+                    
+                    <div class="flex items-center border-4 border-gray-200 rounded-full overflow-hidden w-full sm:w-auto shadow-sm hover:border-socina-pink transition-colors">
+                        <label for="quantidade" class="sr-only">Quantidade</label>
+                        <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="{{ produto.quantidade_estoque }}" 
+                               class="w-24 text-center text-xl font-bold text-gray-900 py-3 focus:outline-none bg-white pl-4">
+                        <span class="text-gray-500 font-bold pr-4 text-sm uppercase">UN.</span>
+                    </div>
+
+                    <button type="submit" class="flex-1 bg-socina-pink text-white text-xl font-black py-4 px-8 rounded-full hover:bg-socina-dark transition-all uppercase tracking-widest shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-3">
+                        <span class="text-2xl">🛍️</span> Adicionar ao Carrinho
+                    </button>
+                </form>
+
             {% else %}
-                <p class="text-sm text-red-600 mb-4">Produto esgotado</p>
-                <button class="w-full text-center bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed" disabled>
-                    Esgotado
-                </button>
+                <div class="bg-red-50 text-red-800 px-6 py-4 rounded-xl font-bold uppercase text-lg border-2 border-red-200 text-center shadow-md">
+                    ❌ Produto Esgotado
+                </div>
             {% endif %}
+
+            <div class="grid grid-cols-3 gap-4 mt-12 pt-8 border-t-2 border-gray-100 text-center text-gray-600 text-xs font-bold uppercase tracking-wider">
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl mb-2">🚚</span>
+                    Frete Grátis <br> acima de R$600
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl mb-2">💳</span>
+                    Parcelamento <br> Facilitado
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-3xl mb-2">🔒</span>
+                    Compra <br> Segura
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
