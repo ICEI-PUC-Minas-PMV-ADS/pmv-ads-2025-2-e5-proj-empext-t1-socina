@@ -18,7 +18,14 @@ from .forms import ProdutoForm, EnderecoForm
 # --- PÁGINAS PÚBLICAS ---
 
 def home(request):
-    return render(request, 'index.html')
+    """
+    Página Inicial.
+    Busca os 4 últimos produtos cadastrados (Lançamentos) para exibir na Home.
+    """
+    # Pega os 4 últimos produtos adicionados (ordem decrescente de ID) que tenham estoque
+    lancamentos = Produto.objects.filter(quantidade_estoque__gt=0).order_by('-id')[:4]
+    
+    return render(request, 'index.html', {'lancamentos': lancamentos})
 
 def catalogo(request):
     produtos = Produto.objects.filter(quantidade_estoque__gt=0)
@@ -111,7 +118,6 @@ def adicionar_ao_carrinho(request, pk):
     carrinho = request.session.get('carrinho', {})
     produto_id = str(pk)
     
-    # Pega quantidade do form (default 1)
     try:
         qtd_solicitada = int(request.POST.get('quantidade', 1))
     except ValueError:
@@ -162,7 +168,6 @@ def checkout_view(request):
     else:
         form = EnderecoForm()
 
-    # Totais para resumo
     subtotal = Decimal('0.0')
     itens_check = []
     for pid, qtd in carrinho.items():
@@ -195,7 +200,6 @@ def finalizar_pedido_whatsapp(request):
         with transaction.atomic():
             cliente = Cliente.objects.get(usuario=request.user)
             
-            # Se não tem endereço, manda pro checkout
             if not cliente.endereco or cliente.endereco == "Não informado":
                  return redirect('checkout')
 
@@ -226,7 +230,6 @@ def finalizar_pedido_whatsapp(request):
             del request.session['carrinho']
             if 'valor_frete' in request.session: del request.session['valor_frete']
 
-            # Texto Zap
             texto = f"Olá! Novo pedido *#{pedido.id}* no site SOCINA. 💕\n\n"
             texto += "*Itens:*\n"
             for item in itens_obj:
