@@ -44,33 +44,35 @@
 
             {% if produto.quantidade_estoque > 0 %}
                 
-                <div class="flex flex-col gap-6 mb-10 bg-gray-50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="flex flex-col gap-8 mb-12 bg-gray-50 p-8 rounded-2xl border border-gray-100 shadow-sm">
                     
                     <div class="flex items-center gap-6 text-gray-800 font-bold">
-                        <img src="{% static 'images/cartao.png' %}" alt="Pagamento" class="w-16 h-16 object-contain mix-blend-multiply">
-                        <span class="text-base uppercase tracking-wider">Parcelamento Facilitado</span>
+                        <img src="{% static 'images/cartao.png' %}" alt="Pagamento" class="w-24 h-24 object-contain mix-blend-multiply">
+                        <span class="text-xl uppercase tracking-wider">Parcelamento Facilitado</span>
                     </div>
                     
                     <div class="flex items-center gap-6 text-gray-800 font-bold">
-                        <img src="{% static 'images/caminhao.jpg' %}" alt="Frete" class="w-16 h-16 object-contain mix-blend-multiply">
-                        <span class="text-base uppercase tracking-wider">Frete para todo o Brasil</span>
+                        <img src="{% static 'images/caminhao.jpg' %}" alt="Frete" class="w-24 h-24 object-contain mix-blend-multiply">
+                        <span class="text-xl uppercase tracking-wider">Frete para todo o Brasil</span>
                     </div>
                 </div>
 
-                <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="POST" class="flex flex-col sm:flex-row gap-4">
+                <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="POST" class="flex flex-col gap-6">
                     {% csrf_token %}
                     
-                    <div class="flex items-center border-2 border-gray-300 rounded-xl overflow-hidden w-full sm:w-auto hover:border-black transition-colors bg-white">
-                        <label for="quantidade" class="sr-only">Quantidade</label>
-                        <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="{{ produto.quantidade_estoque }}" 
-                               class="w-24 text-center text-xl font-bold text-gray-900 py-4 focus:outline-none bg-white pl-2">
-                        <span class="text-gray-500 font-bold pr-6 text-sm uppercase">UN.</span>
-                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex items-center border-2 border-gray-300 rounded-xl overflow-hidden w-full sm:w-auto hover:border-black transition-colors bg-white">
+                            <label for="quantidade" class="sr-only">Quantidade</label>
+                            <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="{{ produto.quantidade_estoque }}" 
+                                   class="w-24 text-center text-2xl font-bold text-gray-900 py-4 focus:outline-none bg-white pl-2">
+                            <span class="text-gray-500 font-bold pr-6 text-sm uppercase">UN.</span>
+                        </div>
 
-                    <button type="submit" class="flex-1 bg-white border-2 border-gray-900 text-gray-900 text-lg font-black py-4 px-8 rounded-xl hover:bg-gray-900 hover:text-white transition-all uppercase tracking-widest shadow-md hover:shadow-xl flex items-center justify-center gap-5 group">
-                        <img src="{% static 'images/sacola.jpg' %}" alt="Comprar" class="w-10 h-10 object-contain mix-blend-multiply group-hover:invert group-hover:brightness-0 transition-all">
-                        Adicionar à Sacola
-                    </button>
+                        <button type="submit" class="flex-1 bg-white border-2 border-gray-900 text-gray-900 text-xl font-black py-5 px-8 rounded-xl hover:bg-gray-900 hover:text-white transition-all uppercase tracking-widest shadow-md hover:shadow-xl flex items-center justify-center gap-6 group">
+                            <img src="{% static 'images/sacola.jpg' %}" alt="Comprar" class="w-12 h-12 object-contain mix-blend-multiply group-hover:invert group-hover:brightness-0 transition-all">
+                            Adicionar à Sacola
+                        </button>
+                    </div>
                 </form>
 
             {% else %}
