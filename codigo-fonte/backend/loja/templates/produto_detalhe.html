@@ -45,13 +45,14 @@
             {% if produto.quantidade_estoque > 0 %}
                 
                 <div class="flex flex-col gap-6 mb-10 bg-gray-50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                    
                     <div class="flex items-center gap-6 text-gray-800 font-bold">
-                        <img src="{% static 'images/Cartão.png' %}" alt="Pagamento" class="w-16 h-16 object-contain mix-blend-multiply">
+                        <img src="{% static 'images/cartao.png' %}" alt="Pagamento" class="w-16 h-16 object-contain mix-blend-multiply">
                         <span class="text-base uppercase tracking-wider">Parcelamento Facilitado</span>
                     </div>
                     
                     <div class="flex items-center gap-6 text-gray-800 font-bold">
-                        <img src="{% static 'images/Caminhão.jpg' %}" alt="Frete" class="w-16 h-16 object-contain mix-blend-multiply">
+                        <img src="{% static 'images/caminhao.jpg' %}" alt="Frete" class="w-16 h-16 object-contain mix-blend-multiply">
                         <span class="text-base uppercase tracking-wider">Frete para todo o Brasil</span>
                     </div>
                 </div>
@@ -67,7 +68,7 @@
                     </div>
 
                     <button type="submit" class="flex-1 bg-white border-2 border-gray-900 text-gray-900 text-lg font-black py-4 px-8 rounded-xl hover:bg-gray-900 hover:text-white transition-all uppercase tracking-widest shadow-md hover:shadow-xl flex items-center justify-center gap-5 group">
-                        <img src="{% static 'images/Sacola.jpg' %}" alt="Comprar" class="w-10 h-10 object-contain mix-blend-multiply group-hover:invert group-hover:brightness-0 transition-all">
+                        <img src="{% static 'images/sacola.jpg' %}" alt="Comprar" class="w-10 h-10 object-contain mix-blend-multiply group-hover:invert group-hover:brightness-0 transition-all">
                         Adicionar à Sacola
                     </button>
                 </form>
