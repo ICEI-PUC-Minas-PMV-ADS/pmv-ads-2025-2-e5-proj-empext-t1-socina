@@ -4,95 +4,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Socina - Natural Beauty{% endblock %}</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <title>{% block title %}SOCINA{% endblock %}</title>
-    
-    <style>
-        body { font-family: 'Montserrat', sans-serif; }
-    </style>
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'socina-pink': '#ff006e',    
-                        'socina-black': '#1a1a1a',    
+                        'socina-pink': '#d4a5a5',
+                        'socina-dark': '#a87b7b',
                     },
-                    letterSpacing: {
-                        'widest-2': '0.2em',
+                    fontFamily: {
+                        'serif': ['Times New Roman', 'serif'],
+                        'sans': ['Segoe UI', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+
+    <style>
+        /* Ajuste fino para garantir que o rodapé fique sempre embaixo */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
-<body class="bg-white flex flex-col min-h-screen">
-   
-   <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-gray-100"> 
-        <div class="container mx-auto px-6 h-24 flex justify-between items-center">
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50 py-4 md:py-6 transition-all duration-300">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
             
-            <nav class="hidden md:flex space-x-8 text-xs font-medium tracking-widest-2 uppercase text-gray-900">
-                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink transition-colors">Produtos</a>
-                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink transition-colors">Lançamentos</a>
+            <nav class="hidden md:flex gap-8 text-sm font-bold uppercase tracking-widest text-gray-500 order-2 md:order-1 w-1/3">
+                <a href="{% url 'home' %}" class="hover:text-black transition-colors">Home</a>
+                <a href="{% url 'catalogo' %}" class="hover:text-black transition-colors">Catálogo</a>
             </nav>
-            
-            <div class="md:hidden text-2xl cursor-pointer text-gray-900">
-                ☰ 
-            </div>
 
-            <div class="absolute left-1/2 transform -translate-x-1/2">
+            <div class="order-1 md:order-2 flex justify-center w-full md:w-1/3">
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-16 md:h-20 w-auto block object-contain hover:opacity-80 transition-opacity">
+                    <img src="{% static 'images/logo.png' %}" alt="SOCINA" class="h-32 md:h-48 w-auto object-contain transition-transform hover:scale-105 duration-300">
                 </a>
             </div>
 
-            <div class="flex items-center space-x-6 text-gray-900 font-medium text-xs tracking-widest-2 uppercase">
+            <div class="flex items-center justify-end gap-6 order-3 w-full md:w-1/3">
                 
-                {% if user.is_authenticated %}
-                    {% if user.is_staff %}
-                        <a href="/admin/" class="hidden md:inline-block hover:text-socina-pink">Admin</a>
-                    {% endif %}
-                    <a href="{% url 'logout' %}" class="hidden md:inline-block hover:text-socina-pink">Sair</a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="hidden md:inline-block hover:text-socina-pink">Login</a>
-                {% endif %}
-
-                <a href="{% url 'ver_carrinho' %}" class="flex items-center hover:opacity-75 transition-opacity">
-                    <img src="{% static 'images/carrinho.jpg' %}" alt="Carrinho" class="h-6 w-auto object-contain">
+                <a href="{% url 'catalogo' %}" class="text-gray-600 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </a>
+
+                <a href="{% url 'ver_carrinho' %}" class="relative group text-gray-600 hover:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    </a>
+
+                <button class="md:hidden text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+        
+        <div class="md:hidden flex justify-center gap-6 mt-4 text-xs font-bold uppercase tracking-widest text-gray-500 border-t pt-4 border-gray-100">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'catalogo' %}">Catálogo</a>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-black text-white py-16 mt-auto">
+        <div class="container mx-auto px-6 text-center md:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                
+                <div class="flex flex-col items-center md:items-start">
+                    <h4 class="text-2xl font-serif italic mb-6">Socina</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                        Beleza natural e estilo atemporal. Peças desenhadas para durar e inspirar.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-500">Loja</h5>
+                    <ul class="space-y-4 text-sm text-gray-300">
+                        <li><a href="{% url 'catalogo' %}" class="hover:text-white hover:underline">Ver Tudo</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Lançamentos</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Acessórios</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-500">Ajuda</h5>
+                    <ul class="space-y-4 text-sm text-gray-300">
+                        <li><a href="#" class="hover:text-white hover:underline">Frete e Entregas</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Trocas e Devoluções</a></li>
+                        <li><a href="#" class="hover:text-white hover:underline">Fale Conosco</a></li>
+                    </ul>
+                </div>
+
+                <div class="flex flex-col items-center md:items-start">
+                    <h5 class="text-sm font-bold uppercase tracking-widest mb-6 text-gray-500">Siga-nos</h5>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition-colors">
+                            Instagram
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition-colors">
+                            Facebook
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="border-t border-gray-800 mt-16 pt-8 text-center text-gray-500 text-xs uppercase tracking-widest">
+                &copy; 2025 Socina. Todos os direitos reservados.
             </div>
         </div>
-   </header>
-
-   <div class="h-24"></div>
-
-   <main class="flex-grow">
-        {% block content %}{% endblock %}
-   </main>
-
-   <footer class="bg-white border-t border-gray-100 py-12 mt-12 text-center text-gray-900">
-        <h2 class="text-2xl font-bold tracking-widest-2 mb-6">SOCINA</h2>
-        <div class="flex justify-center space-x-8 text-xs font-medium uppercase tracking-widest text-gray-500 mb-8">
-            <a href="#" class="hover:text-socina-pink">Produtos</a>
-            <a href="#" class="hover:text-socina-pink">Sobre</a>
-            <a href="#" class="hover:text-socina-pink">Contato</a>
-        </div>
-        <p class="text-[10px] text-gray-400 uppercase tracking-widest">&copy; 2025 Socina.</p>
-   </footer>
-
-   <a href="https://wa.me/553192742082" target="_blank" class="fixed bottom-6 right-6 z-50 bg-black text-white p-3 rounded-full shadow-2xl hover:bg-socina-pink transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
-            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
-        </svg>
-   </a>
+    </footer>
 
 </body>
 </html>
