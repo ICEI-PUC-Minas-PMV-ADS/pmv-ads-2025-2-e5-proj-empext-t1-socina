@@ -16,7 +16,6 @@
     
     <style>
         body { font-family: 'Montserrat', sans-serif; }
-        /* O menu vai ficar transparente sobre a imagem, então não precisa de padding-top na home */
     </style>
     
     <script>
@@ -28,7 +27,7 @@
                         'socina-black': '#1a1a1a',    
                     },
                     letterSpacing: {
-                        'widest-2': '0.2em', // Espaçamento chique entre letras
+                        'widest-2': '0.2em',
                     }
                 }
             }
@@ -41,8 +40,8 @@
         <div class="container mx-auto px-6 h-24 flex justify-between items-center">
             
             <nav class="hidden md:flex space-x-8 text-xs font-medium tracking-widest-2 uppercase text-gray-900">
-                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink transition-colors">Shop</a>
-                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink transition-colors">New In</a>
+                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink transition-colors">Produtos</a>
+                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink transition-colors">Lançamentos</a>
             </nav>
             
             <div class="md:hidden text-2xl cursor-pointer text-gray-900">
@@ -66,11 +65,8 @@
                     <a href="{% url 'login' %}" class="hidden md:inline-block hover:text-socina-pink">Login</a>
                 {% endif %}
 
-                <a href="{% url 'ver_carrinho' %}" class="flex items-center hover:text-socina-pink transition-colors">
-                    <span class="mr-2 hidden md:inline-block">Bag</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
+                <a href="{% url 'ver_carrinho' %}" class="flex items-center hover:opacity-75 transition-opacity">
+                    <img src="{% static 'images/carrinho.jpg' %}" alt="Carrinho" class="h-6 w-auto object-contain">
                 </a>
             </div>
         </div>
@@ -85,11 +81,11 @@
    <footer class="bg-white border-t border-gray-100 py-12 mt-12 text-center text-gray-900">
         <h2 class="text-2xl font-bold tracking-widest-2 mb-6">SOCINA</h2>
         <div class="flex justify-center space-x-8 text-xs font-medium uppercase tracking-widest text-gray-500 mb-8">
-            <a href="#" class="hover:text-socina-pink">Shop</a>
+            <a href="#" class="hover:text-socina-pink">Produtos</a>
             <a href="#" class="hover:text-socina-pink">Sobre</a>
             <a href="#" class="hover:text-socina-pink">Contato</a>
         </div>
-        <p class="text-[10px] text-gray-400 uppercase tracking-widest">&copy; 2025 Socina Brand.</p>
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest">&copy; 2025 Socina.</p>
    </footer>
 
    <a href="https://wa.me/553192742082" target="_blank" class="fixed bottom-6 right-6 z-50 bg-black text-white p-3 rounded-full shadow-2xl hover:bg-socina-pink transition-colors">
