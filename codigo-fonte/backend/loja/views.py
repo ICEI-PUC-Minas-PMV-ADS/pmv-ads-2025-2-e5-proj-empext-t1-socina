@@ -12,7 +12,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 
-from .models import Produto, Pedido, ItemPedido, Cliente
+# ADICIONADO: Import do model Categoria para os filtros funcionarem
+from .models import Produto, Pedido, ItemPedido, Cliente, Categoria
 from .forms import ProdutoForm, EnderecoForm
 
 # --- PÁGINAS PÚBLICAS ---
@@ -28,8 +29,30 @@ def home(request):
     return render(request, 'index.html', {'lancamentos': lancamentos})
 
 def catalogo(request):
+    """
+    Página de Catálogo com Filtros de Busca e Categoria.
+    """
+    # 1. Pega todos os produtos com estoque
     produtos = Produto.objects.filter(quantidade_estoque__gt=0)
-    return render(request, 'catalogo.html', {'produtos': produtos})
+    
+    # 2. Pega todas as categorias para preencher o <select> no HTML
+    categorias = Categoria.objects.all()
+
+    # 3. Processa a Busca por Nome (q)
+    search_query = request.GET.get('q')
+    if search_query:
+        produtos = produtos.filter(nome__icontains=search_query)
+
+    # 4. Processa o Filtro por Categoria
+    category_id = request.GET.get('categoria')
+    if category_id:
+        produtos = produtos.filter(categoria_id=category_id)
+
+    context = {
+        'produtos': produtos,
+        'categorias': categorias, # Enviando categorias para o template
+    }
+    return render(request, 'catalogo.html', context)
 
 def produto_detalhe_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
@@ -44,6 +67,7 @@ def cadastro_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Cria o perfil do cliente ao cadastrar
             Cliente.objects.create(usuario=user, endereco="Não informado")
             login(request, user)
             return redirect('catalogo')
@@ -94,10 +118,11 @@ def ver_carrinho(request):
     if len(carrinho) != len(carrinho_atualizado):
         request.session['carrinho'] = carrinho_atualizado
 
+    # Regra de Frete
     if not itens_carrinho:
         valor_frete = Decimal('0.0')
     elif subtotal_pedido >= 600:
-        valor_frete = Decimal('0.0')
+        valor_frete = Decimal('0.0') # Frete Grátis
     else:
         valor_frete = Decimal('15.00')
 
@@ -157,6 +182,7 @@ def checkout_view(request):
     if request.method == 'POST':
         form = EnderecoForm(request.POST)
         if form.is_valid():
+            # Formata o endereço completo
             endereco_completo = f"{form.cleaned_data['rua']}, {form.cleaned_data['numero']}"
             if form.cleaned_data['complemento']:
                 endereco_completo += f" - {form.cleaned_data['complemento']}"
@@ -166,6 +192,7 @@ def checkout_view(request):
             cliente.save()
             return redirect('finalizar_pedido')
     else:
+        # Tenta preencher o formulário se o cliente já tiver endereço salvo (opcional, lógica simplificada aqui)
         form = EnderecoForm()
 
     subtotal = Decimal('0.0')
@@ -197,6 +224,7 @@ def finalizar_pedido_whatsapp(request):
     valor_frete = Decimal(request.session.get('valor_frete', '0.0'))
 
     try:
+        # Usa transação atômica para garantir que o estoque só baixe se o pedido for criado
         with transaction.atomic():
             cliente = Cliente.objects.get(usuario=request.user)
             
@@ -206,6 +234,7 @@ def finalizar_pedido_whatsapp(request):
             subtotal_pedido = Decimal('0.0')
             itens_obj = []
             
+            # Calcula totais e prepara itens
             for produto_id, quantidade in carrinho.items():
                 produto = Produto.objects.get(id=int(produto_id))
                 subtotal = produto.preco * quantidade
@@ -214,6 +243,7 @@ def finalizar_pedido_whatsapp(request):
             
             total_geral = subtotal_pedido + valor_frete
 
+            # Cria o Pedido
             pedido = Pedido.objects.create(
                 cliente=cliente,
                 total=total_geral,
@@ -221,15 +251,18 @@ def finalizar_pedido_whatsapp(request):
                 status='em andamento' 
             )
 
+            # Cria os Itens do Pedido e Baixa Estoque
             for item in itens_obj:
                 ItemPedido.objects.create(pedido=pedido, produto=item['produto'], quantidade=item['qtd'], subtotal=item['sub'])
                 prod = item['produto']
                 prod.quantidade_estoque -= item['qtd']
                 prod.save()
 
+            # Limpa sessão
             del request.session['carrinho']
             if 'valor_frete' in request.session: del request.session['valor_frete']
 
+            # --- GERAÇÃO DA MENSAGEM WHATSAPP ---
             texto = f"Olá! Novo pedido *#{pedido.id}* no site SOCINA. 💕\n\n"
             texto += "*Itens:*\n"
             for item in itens_obj:
@@ -244,22 +277,28 @@ def finalizar_pedido_whatsapp(request):
             texto += "\nAguardo a chave PIX!"
 
             texto_encoded = urllib.parse.quote(texto)
-            numero_whatsapp = "553192742082"
+            numero_whatsapp = "553192742082" # Seu número
+            
+            
+
             return redirect(f"https://wa.me/{numero_whatsapp}?text={texto_encoded}")
 
     except Exception as e:
-        messages.error(request, f"Erro: {e}")
+        messages.error(request, f"Erro ao processar pedido: {e}")
         return redirect('ver_carrinho')
 
-# --- DASHBOARD ---
+# --- DASHBOARD (ÁREA ADMINISTRATIVA) ---
 
 @staff_member_required
 def admin_dashboard_view(request):
     total_pedidos = Pedido.objects.count()
     pedidos_concluidos = Pedido.objects.filter(status='concluido')
+    
+    # Agregações
     total_vendas_valor = pedidos_concluidos.aggregate(Sum('total'))['total__sum'] or 0
     total_vendas_qtd = pedidos_concluidos.count()
 
+    # Dados para o Gráfico (Vendas por Mês)
     vendas_mensais = (
         Pedido.objects.filter(status='concluido')
         .annotate(mes=TruncMonth('data'))
@@ -282,9 +321,12 @@ def admin_dashboard_view(request):
 def exportar_relatorio_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="relatorio_vendas.csv"'
+    
     writer = csv.writer(response)
     writer.writerow(['ID', 'Cliente', 'Data', 'Total', 'Status'])
+    
     for p in Pedido.objects.all().order_by('-data'):
-        cli = p.cliente.usuario.username if p.cliente and p.cliente.usuario else "X"
+        cli = p.cliente.usuario.username if p.cliente and p.cliente.usuario else "Usuario Removido"
         writer.writerow([p.id, cli, p.data, p.total, p.status])
+        
     return response
