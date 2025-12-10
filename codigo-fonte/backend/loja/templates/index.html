@@ -28,28 +28,9 @@
    <section id="lancamentos" class="py-24 bg-white">
         <div class="container mx-auto px-6">
             
-            <div class="text-center mb-10">
+            <div class="text-center mb-16">
                 <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Shop</h3>
                 <h2 class="text-2xl font-light text-gray-900 tracking-widest uppercase">Lançamentos</h2>
-            </div>
-
-            <div class="max-w-4xl mx-auto mb-16 p-6 bg-gray-50 rounded-lg flex flex-col md:flex-row gap-4 justify-center items-center border border-gray-100 shadow-sm">
-                <form action="{% url 'catalogo' %}" method="GET" class="w-full flex flex-col md:flex-row gap-4">
-                    
-                    <input type="text" name="q" placeholder="O que você procura?" 
-                           class="flex-grow p-3 border border-gray-300 rounded text-sm focus:outline-none focus:border-socina-pink uppercase tracking-wide">
-                    
-                    <select name="categoria" class="p-3 border border-gray-300 rounded text-sm bg-white cursor-pointer focus:outline-none focus:border-socina-pink uppercase tracking-wide text-gray-600">
-                        <option value="">Todas as Categorias</option>
-                        {% for cat in categorias %}
-                            <option value="{{ cat.id }}">{{ cat.nome }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <button type="submit" class="bg-black text-white px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">
-                        Filtrar
-                    </button>
-                </form>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -80,7 +61,7 @@
                 </div>
                 {% empty %}
                     <div class="col-span-3 text-center text-gray-400 py-12 text-sm uppercase tracking-widest">
-                        Nenhum produto encontrado.
+                        Nenhum produto em destaque no momento.
                     </div>
                 {% endfor %}
 
@@ -95,6 +76,7 @@
    </section>
 
    <section class="flex flex-col md:flex-row h-auto md:h-[600px]">
+        
         <div class="w-full md:w-1/2 h-[400px] md:h-full relative">
             <img src="{% static 'images/modelo2.jpg' %}" class="w-full h-full object-cover" alt="Socina Editorial">
         </div>
@@ -112,6 +94,7 @@
                 Sobre a Socina
             </a>
         </div>
+
    </section>
 
 {% endblock %}
