@@ -1,93 +1,102 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Bem-vindo à SOCINA{% endblock %}
+{% block title %}Socina - Natural Beauty{% endblock %}
 
 {% block content %}
    
-   <section class="bg-socina-primary min-h-[700px] flex items-center relative overflow-hidden pt-10 md:pt-0">
-        
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full py-12">
+   <section class="relative w-full h-[85vh] overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="{% static 'images/modelo1.jpg' %}" class="w-full h-full object-cover object-center" alt="Socina Hero">
+            <div class="absolute inset-0 bg-black/20"></div>
+        </div>
+
+        <div class="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-4">
+            <p class="text-xs md:text-sm font-medium tracking-[0.3em] uppercase mb-4 opacity-90">Nova Coleção</p>
+            <h2 class="text-5xl md:text-7xl font-light tracking-wide mb-8 uppercase" style="font-family: 'Times New Roman', serif;">
+                Socina <span class="italic">Essence</span>
+            </h2>
+            <p class="max-w-lg text-sm md:text-base leading-relaxed opacity-90 mb-10 tracking-wide font-light">
+                Descubra a elegância atemporal com peças desenhadas para elevar a sua confiança e estilo natural.
+            </p>
+            <a href="{% url 'catalogo' %}" class="border border-white text-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300">
+                Ver Coleção
+            </a>
+        </div>
+   </section>
+
+
+   <section id="lancamentos" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
             
-            <div class="text-left z-10 md:pl-12 relative">
-                
-                <h2 class="text-7xl md:text-9xl font-black text-gray-900 leading-none mb-6 tracking-wide uppercase drop-shadow-sm">
-                    Bem-vinda <br> ao seu <br>
-                    <span class="text-socina-pink drop-shadow-md">Novo Mood.</span>
-                </h2>
-                
-                <p class="text-gray-900 text-xl font-bold uppercase tracking-widest mb-12">
-                    Básicos versáteis, atemporais e confortáveis.
-                </p>
-
-                <div class="border-4 border-socina-pink bg-white/50 backdrop-blur-md p-8 inline-block mb-12 shadow-xl -rotate-2 hover:rotate-0 transition-transform">
-                    <p class="text-4xl font-black text-socina-pink">10% OFF</p>
-                    <p class="text-base text-gray-900 font-bold uppercase leading-relaxed mt-2">
-                        Na primeira compra <br> use cupom: <span class="bg-socina-pink text-white px-2">BEMVINDA</span>
-                    </p>
-                </div>
-
-                <div class="block">
-                    <a href="{% url 'catalogo' %}" class="bg-socina-pink text-white text-xl font-black py-5 px-16 hover:bg-socina-dark transition-all uppercase tracking-widest shadow-xl hover:shadow-2xl hover:scale-105 inline-block rounded-full">
-                        Ver Coleção
-                    </a>
-                </div>
+            <div class="text-center mb-16">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Shop</h3>
+                <h2 class="text-2xl font-light text-gray-900 tracking-widest uppercase">Lançamentos</h2>
             </div>
-
-            <div class="relative h-[500px] md:h-[700px] w-full flex justify-center items-center mt-10 md:mt-0">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 
-                <div class="absolute right-5 top-0 md:right-10 md:top-10 w-64 md:w-[400px] h-80 md:h-[550px] bg-white p-4 shadow-2xl transform rotate-6 border-4 border-white">
-                    <img src="{% static 'images/modelo1.jpg' %}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-500">
-                </div>
+                {% for produto in lancamentos %}
+                <div class="group flex flex-col items-center">
+                    <a href="{% url 'produto_detalhe' produto.id %}" class="block w-full aspect-square bg-gray-50 border border-gray-200 p-8 flex items-center justify-center relative overflow-hidden">
+                        {% if produto.imagem %}
+                            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                            <span class="text-gray-300 text-xs uppercase tracking-widest">Sem Imagem</span>
+                        {% endif %}
+                        
+                        <div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors flex items-center justify-center">
+                            <span class="bg-black text-white text-[10px] uppercase tracking-widest px-4 py-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                Ver Detalhes
+                            </span>
+                        </div>
+                    </a>
 
-                <div class="absolute left-5 bottom-0 md:left-10 md:bottom-20 w-56 md:w-[350px] h-72 md:h-[450px] bg-white p-4 shadow-2xl transform -rotate-6 z-20 border-4 border-socina-pink">
-                     <img src="{% static 'images/modelo2.jpg' %}" class="w-full h-full object-cover">
+                    <div class="text-center mt-6">
+                        <h4 class="text-xs font-bold text-gray-900 uppercase tracking-widest mb-1">{{ produto.nome }}</h4>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-3">{{ produto.categoria.nome }}</p>
+                        <span class="border border-gray-300 px-3 py-1 text-[10px] font-medium text-gray-900 uppercase tracking-widest">
+                            R$ {{ produto.preco }}
+                        </span>
+                    </div>
                 </div>
-                
+                {% empty %}
+                    <div class="col-span-3 text-center text-gray-400 py-12 text-sm uppercase tracking-widest">
+                        Nenhum produto em destaque no momento.
+                    </div>
+                {% endfor %}
+
+            </div>
+            
+            <div class="text-center mt-16">
+                <a href="{% url 'catalogo' %}" class="inline-block text-xs font-bold text-socina-pink uppercase tracking-widest border-b border-socina-pink pb-1 hover:text-black hover:border-black transition-colors">
+                    Visualizar Loja Completa
+                </a>
             </div>
         </div>
    </section>
 
-   <section id="lancamentos" class="bg-white py-24">
-        <div class="container mx-auto px-4">
-            
-            <h2 class="text-5xl font-black text-center text-socina-pink mb-20 uppercase tracking-widest">
-                Lançamentos
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-                
-                {% for produto in lancamentos %}
-                <div class="group cursor-pointer">
-                    <a href="{% url 'produto_detalhe' produto.id %}">
-                        <div class="overflow-hidden mb-6 relative shadow-xl rounded-2xl border-2 border-gray-50">
-                            {% if produto.imagem %}
-                                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="w-full h-[450px] object-cover transition-transform duration-700 group-hover:scale-110">
-                            {% else %}
-                                <div class="w-full h-[450px] bg-gray-100 flex items-center justify-center text-gray-400 font-bold">Sem Foto</div>
-                            {% endif %}
-                            
-                            <div class="absolute bottom-0 left-0 right-0 bg-socina-pink/90 text-white text-center py-4 font-bold uppercase tracking-wider opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                                Ver Detalhes
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 uppercase mb-2 truncate">{{ produto.nome }}</h3>
-                        <p class="text-socina-pink font-black text-2xl">R$ {{ produto.preco }}</p>
-                    </a>
-                </div>
-                {% empty %}
-                <div class="col-span-4 text-center py-10">
-                    <p class="text-gray-500 text-lg">Ainda não há lançamentos cadastrados.</p>
-                </div>
-                {% endfor %}
 
-                 <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center mt-16">
-                    <a href="{% url 'catalogo' %}" class="inline-block border-4 border-socina-pink text-socina-pink font-black py-4 px-12 hover:bg-socina-pink hover:text-white transition-all uppercase tracking-widest rounded-full text-xl shadow-lg">
-                        Ver todos os produtos
-                    </a>
-                 </div>
-            </div>
+   <section class="flex flex-col md:flex-row h-auto md:h-[600px]">
+        
+        <div class="w-full md:w-1/2 h-[400px] md:h-full relative">
+            <img src="{% static 'images/modelo2.jpg' %}" class="w-full h-full object-cover" alt="Socina Editorial">
         </div>
+
+        <div class="w-full md:w-1/2 bg-black text-white flex flex-col justify-center items-center text-center p-12 md:p-24">
+            <h3 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-6">Manifesto</h3>
+            <h2 class="text-3xl md:text-4xl font-light leading-tight mb-8 tracking-wide">
+                Estilo que celebra a <br>
+                <span class="italic text-gray-400">sua beleza natural.</span>
+            </h2>
+            <p class="text-gray-400 text-sm leading-7 max-w-md mb-10 font-light">
+                Nossas peças aproveitam o poder do design minimalista para destacar sua potência natural. Comprometidos com conforto e elegância, garantimos que cada look seja ético e feito com cuidado.
+            </p>
+            <a href="{% url 'catalogo' %}" class="border border-gray-600 px-8 py-3 text-[10px] uppercase tracking-widest hover:border-white hover:bg-white hover:text-black transition-all">
+                Sobre a Socina
+            </a>
+        </div>
+
    </section>
 
 {% endblock %}

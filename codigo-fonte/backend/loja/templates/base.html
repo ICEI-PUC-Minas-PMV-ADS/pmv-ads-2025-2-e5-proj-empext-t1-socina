@@ -10,20 +10,13 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <title>{% block title %}SOCINA{% endblock %}</title>
     
     <style>
         body { font-family: 'Montserrat', sans-serif; }
-        
-        /* CÁLCULO DO ESPAÇAMENTO PARA O CONTEÚDO NÃO FICAR ESCONDIDO:
-           Barra Rosa (40px) + Menu Branco (112px) + Folga = ~160px */
-        main { padding-top: 155px; } 
-        
-        @media (min-width: 768px) {
-            main { padding-top: 170px; }
-        }
+        /* O menu vai ficar transparente sobre a imagem, então não precisa de padding-top na home */
     </style>
     
     <script>
@@ -31,9 +24,11 @@
             theme: {
                 extend: {
                     colors: {
-                        'socina-primary': '#fecccd', 
                         'socina-pink': '#ff006e',    
-                        'socina-dark': '#be185d',    
+                        'socina-black': '#1a1a1a',    
+                    },
+                    letterSpacing: {
+                        'widest-2': '0.2em', // Espaçamento chique entre letras
                     }
                 }
             }
@@ -42,62 +37,63 @@
 </head>
 <body class="bg-white flex flex-col min-h-screen">
    
-   <div class="fixed top-0 left-0 right-0 z-50 h-10 bg-socina-pink text-white text-center flex items-center justify-center text-xs md:text-sm font-bold tracking-widest uppercase shadow-sm">
-        Ganhe 10% de desconto usando o cupom BEMVINDA
-   </div>
-
-   <header class="bg-white/95 backdrop-blur-md shadow-md fixed top-10 left-0 right-0 z-40 h-28 flex items-center transition-all"> 
-        <div class="container mx-auto flex justify-between items-center px-6 w-full">
+   <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-gray-100"> 
+        <div class="container mx-auto px-6 h-24 flex justify-between items-center">
             
-            <nav class="hidden md:flex space-x-8 text-gray-900 font-black text-base uppercase tracking-wide">
-                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink border-b-2 border-transparent hover:border-socina-pink transition-all">
-                    Shop
-                </a>
-                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink border-b-2 border-transparent hover:border-socina-pink transition-all">
-                    Lançamentos
-                </a>
+            <nav class="hidden md:flex space-x-8 text-xs font-medium tracking-widest-2 uppercase text-gray-900">
+                <a href="{% url 'catalogo' %}" class="hover:text-socina-pink transition-colors">Shop</a>
+                <a href="{% url 'home' %}#lancamentos" class="hover:text-socina-pink transition-colors">New In</a>
             </nav>
             
-            <div class="md:hidden text-3xl cursor-pointer text-socina-pink">
+            <div class="md:hidden text-2xl cursor-pointer text-gray-900">
                 ☰ 
             </div>
 
-            <h1 class="absolute left-1/2 transform -translate-x-1/2 top-1 md:top-0">
+            <div class="absolute left-1/2 transform -translate-x-1/2">
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-24 md:h-28 w-auto block object-contain hover:scale-105 transition-transform drop-shadow-sm bg-white/50 rounded-full px-2">
+                    <img src="{% static 'images/img.png' %}" alt="SOCINA" class="h-16 md:h-20 w-auto block object-contain hover:opacity-80 transition-opacity">
                 </a>
-            </h1>
+            </div>
 
-            <div class="flex items-center space-x-6 text-gray-800">
+            <div class="flex items-center space-x-6 text-gray-900 font-medium text-xs tracking-widest-2 uppercase">
+                
                 {% if user.is_authenticated %}
                     {% if user.is_staff %}
-                        <a href="/admin/" class="text-[10px] md:text-xs font-bold text-white bg-socina-pink border border-socina-pink px-2 py-1 rounded hover:bg-socina-dark transition shadow-md">ADMIN</a>
+                        <a href="/admin/" class="hidden md:inline-block hover:text-socina-pink">Admin</a>
                     {% endif %}
-                    <a href="{% url 'logout' %}" class="text-xs md:text-sm font-bold hover:text-socina-pink hidden md:block">SAIR</a>
+                    <a href="{% url 'logout' %}" class="hidden md:inline-block hover:text-socina-pink">Sair</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="text-3xl hover:text-socina-pink transition-colors" title="Entrar">
-                        👤
-                    </a>
+                    <a href="{% url 'login' %}" class="hidden md:inline-block hover:text-socina-pink">Login</a>
                 {% endif %}
 
-                <a href="{% url 'ver_carrinho' %}" class="relative text-3xl hover:text-socina-pink transition-colors" title="Carrinho">
-                    🛍️
+                <a href="{% url 'ver_carrinho' %}" class="flex items-center hover:text-socina-pink transition-colors">
+                    <span class="mr-2 hidden md:inline-block">Bag</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
                 </a>
             </div>
         </div>
    </header>
 
+   <div class="h-24"></div>
+
    <main class="flex-grow">
         {% block content %}{% endblock %}
    </main>
 
-   <footer class="bg-gray-900 py-10 mt-12 text-center text-white text-sm">
-        <p class="font-bold tracking-wider mb-2">SOCINA</p>
-        <p class="text-gray-400">&copy; 2025 Todos os direitos reservados.</p>
+   <footer class="bg-white border-t border-gray-100 py-12 mt-12 text-center text-gray-900">
+        <h2 class="text-2xl font-bold tracking-widest-2 mb-6">SOCINA</h2>
+        <div class="flex justify-center space-x-8 text-xs font-medium uppercase tracking-widest text-gray-500 mb-8">
+            <a href="#" class="hover:text-socina-pink">Shop</a>
+            <a href="#" class="hover:text-socina-pink">Sobre</a>
+            <a href="#" class="hover:text-socina-pink">Contato</a>
+        </div>
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest">&copy; 2025 Socina Brand.</p>
    </footer>
 
-   <a href="https://wa.me/553192742082" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-transform border-2 border-white">
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+   <a href="https://wa.me/553192742082" target="_blank" class="fixed bottom-6 right-6 z-50 bg-black text-white p-3 rounded-full shadow-2xl hover:bg-socina-pink transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
             <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592z"/>
         </svg>
    </a>
